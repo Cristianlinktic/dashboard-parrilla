@@ -1,0 +1,247 @@
+/* login.module.css */
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 24px;
+  padding: 42px 32px 32px 32px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+  position: relative;
+  z-index: 10;
+  overflow: hidden; /* Clips the top banner */
+}
+
+/* Colombian Flag Accent Stripe */
+.loginCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(
+    to right, 
+    var(--col-yellow-flag) 0% 50%, 
+    var(--col-blue-flag) 50% 75%, 
+    var(--col-red-flag) 75% 100%
+  );
+}
+
+.logoArea {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--col-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.formGroup {
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px 16px;
+  padding-right: 48px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.passwordToggle:hover {
+  color: var(--text-primary);
+}
+
+.errorMsg {
+  background-color: var(--col-red-light);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: var(--col-red);
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.button {
+  width: 100%;
+  background: linear-gradient(135deg, var(--col-blue) 0%, #1e40af 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.15);
+  transition: all 0.2s ease;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(29, 78, 216, 0.25);
+  background: linear-gradient(135deg, #1e40af 0%, #172554 100%);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.buttonDisabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.keyInfo {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.keyTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.keyList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.keyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  background: rgba(15, 23, 42, 0.03);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.keyRole {
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.keyValue {
+  font-family: var(--font-geist-mono), monospace;
+  color: var(--col-blue);
+  background: var(--col-blue-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dotViewer {
+  background-color: var(--text-secondary);
+}
+
+.dotEditor {
+  background-color: #10b981;
+}
