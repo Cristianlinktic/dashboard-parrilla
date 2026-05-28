@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
+
 import { ContentItem, HOURS, INITIAL_CONTENT, PLATFORMS, PlatformId } from '../../data/mockData';
 import styles from './dashboard.module.css';
 
@@ -9,8 +11,10 @@ export default function DashboardPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [role, setRole] = useState<'editor' | 'viewer'>('viewer');
-  const [contentList, setContentList] = useState<ContentItem[]>([]);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [contentList, setContentList] = useState<ContentItem[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,18 +31,15 @@ export default function DashboardPage() {
     setIsMounted(true);
     setCurrentTime(new Date());
 
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 30000); // update every 30 seconds
-    
-    // Check session
+    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
+
+    // Load session
     const sessionStr = localStorage.getItem('dashboard_session');
     if (!sessionStr) {
       router.replace('/');
       clearInterval(timer);
       return;
     }
-    
     try {
       const session = JSON.parse(sessionStr);
       setRole(session.role);
@@ -48,18 +49,37 @@ export default function DashboardPage() {
       return;
     }
 
-    // Load content list from localStorage, or use initial mock data if not set
-    const savedContent = localStorage.getItem('dashboard_content_list');
-    if (savedContent) {
+    // Load content from Supabase, fallback to localStorage
+    const loadContent = async () => {
       try {
-        setContentList(JSON.parse(savedContent));
+        const { data, error } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+        if (error) throw error;
+        if (data && data.length) {
+          const remoteContent = data[0].content as ContentItem[];
+          setContentList(remoteContent);
+          localStorage.setItem('dashboard_content_list', JSON.stringify(remoteContent));
+        } else {
+          // No remote data, use localStorage or initial
+          const saved = localStorage.getItem('dashboard_content_list');
+          if (saved) {
+            setContentList(JSON.parse(saved));
+          } else {
+            setContentList(INITIAL_CONTENT);
+            localStorage.setItem('dashboard_content_list', JSON.stringify(INITIAL_CONTENT));
+          }
+        }
       } catch (e) {
-        setContentList(INITIAL_CONTENT);
+        // On any error, fallback to localStorage/initial
+        const saved = localStorage.getItem('dashboard_content_list');
+        if (saved) {
+          setContentList(JSON.parse(saved));
+        } else {
+          setContentList(INITIAL_CONTENT);
+          localStorage.setItem('dashboard_content_list', JSON.stringify(INITIAL_CONTENT));
+        }
       }
-    } else {
-      setContentList(INITIAL_CONTENT);
-      localStorage.setItem('dashboard_content_list', JSON.stringify(INITIAL_CONTENT));
-    }
+    };
+    loadContent();
 
     return () => clearInterval(timer);
   }, [router]);
@@ -97,16 +117,25 @@ export default function DashboardPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteItem = (id: string) => {
+  const handleDeleteItem = async (id: string) => {
     if (role !== 'editor') return;
     if (confirm('¿Estás seguro de que deseas eliminar esta publicación de la parrilla?')) {
       const updatedList = contentList.filter(item => item.id !== id);
       setContentList(updatedList);
       localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
+      setIsSaving(true);
+      try {
+        await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+      } catch (e) {
+        console.error('Supabase delete upsert error:', e);
+        setErrorMsg('Error al eliminar en la nube.');
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
-  const handleSaveItem = (e: React.FormEvent) => {
+  const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formDescription.trim()) {
       alert('Por favor, escribe el texto o descripción del contenido.');
@@ -147,11 +176,18 @@ export default function DashboardPage() {
       }
     }
 
-    // Sort updatedList by time
-    updatedList.sort((a, b) => a.time.localeCompare(b.time));
-
+    // Save updated list both locally and to Supabase
     setContentList(updatedList);
     localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
+        setIsSaving(true);
+        try {
+          await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+        } catch (e) {
+          console.error('Supabase upsert error:', e);
+          setErrorMsg('Error al guardar en la nube.');
+        } finally {
+          setIsSaving(false);
+        }
     setIsModalOpen(false);
   };
 
@@ -161,7 +197,8 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.dashboardContainer}>
-      {/* Top Navbar */}
+      {isSaving && <div className={styles.savingOverlay}>Guardando...</div>}
+      {errorMsg && <div className={styles.errorBox}>{errorMsg}</div>}
       <header className={styles.header}>
         <div className={styles.headerBrand}>
           <h1 className={styles.eventTitle}>
