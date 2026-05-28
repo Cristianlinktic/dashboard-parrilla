@@ -59,36 +59,14 @@ export default function LoginPage() {
     <div className={styles.container}>
       <div className={`${styles.loginCard} glass`}>
         {/* Social Media Logos Banner */}
-        <div className={styles.logoArea}>
-          <div className={styles.logoIcon} style={{ backgroundColor: '#1877F2' }} title="Facebook">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-          </div>
-          <div 
-            className={styles.logoIcon} 
-            style={{ background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)' }} 
-            title="Instagram"
-          >
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-            </svg>
-          </div>
-          <div className={styles.logoIcon} style={{ backgroundColor: '#000000', border: '1px solid rgba(255,255,255,0.1)' }} title="TikTok">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.86-.74-3.94-1.74-.22-.22-.4-.45-.58-.7v5.13c.05 3.07-1.41 6.03-4.14 7.36-2.83 1.43-6.52 1.05-8.93-1.07-2.45-2.14-3.28-5.74-2.02-8.77C3.99 7.48 7.34 5.3 10.72 5.7c.2.02.4.06.6.1v4.09c-.89-.26-1.89-.2-2.7.25-.95.53-1.52 1.57-1.54 2.66-.02 1.55 1.25 2.91 2.8 2.91 1.49-.03 2.72-1.22 2.78-2.71.02-3.14.01-6.28.01-9.42-.01-.18-.09-.34-.15-.5z"/>
-            </svg>
-          </div>
-          <div className={styles.logoIcon} style={{ backgroundColor: '#111' }} title="X">
-            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-            </svg>
-          </div>
+        <div className={styles.logoGroup}>
+          <img src="/icono-cne-partido-nx.svg" alt="Logo CNE" className={styles.logo} />
+          <img src="/logo-actores-nx.svg" alt="Logo Actores" className={styles.logo} />
         </div>
 
         <div className={styles.header}>
-          <h1 className={styles.title}>Parrilla de Contenidos</h1>
-          <p className={styles.subtitle}>Dashboard del Evento</p>
+          <h1 className={styles.title}>ContentPanel</h1>
+          <p className={styles.subtitle}>Evento de la Misión de Observación Internacional</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -154,25 +132,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className={styles.keyInfo}>
-          <h2 className={styles.keyTitle}>Contraseñas de Acceso (Demo)</h2>
-          <div className={styles.keyList}>
-            <div className={styles.keyItem}>
-              <span className={styles.keyRole}>
-                <span className={`${styles.dot} styles.dotEditor`} style={{ backgroundColor: '#10b981' }}></span>
-                Editor (Completo)
-              </span>
-              <span className={styles.keyValue}>editor123</span>
-            </div>
-            <div className={styles.keyItem}>
-              <span className={styles.keyRole}>
-                <span className={`${styles.dot} styles.dotViewer`} style={{ backgroundColor: '#94a3b8' }}></span>
-                Visualizador (Lectura)
-              </span>
-              <span className={styles.keyValue}>visual123</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
