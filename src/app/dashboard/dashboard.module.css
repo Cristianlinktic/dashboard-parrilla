@@ -29,12 +29,10 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(
-    to right, 
-    var(--col-yellow-flag) 0% 50%, 
-    var(--col-blue-flag) 50% 75%, 
-    var(--col-red-flag) 75% 100%
-  );
+  background: linear-gradient(to right,
+      var(--col-yellow-flag) 0% 50%,
+      var(--col-blue-flag) 50% 75%,
+      var(--col-red-flag) 75% 100%);
 }
 
 .headerBrand {
@@ -79,7 +77,8 @@
 }
 
 .roleEditor {
-  color: #15803d; /* green editor */
+  color: #15803d;
+  /* green editor */
   background: #f0fdf4;
   border-color: #bbf7d0;
 }
@@ -124,7 +123,8 @@
 }
 
 .infoBanner {
-  background: #fef8e8; /* Soft yellow alert container */
+  background: #fef8e8;
+  /* Soft yellow alert container */
   border: 1px solid #fde047;
   border-radius: 12px;
   padding: 14px 20px;
@@ -136,14 +136,16 @@
 }
 
 .infoBannerViewer {
-  background: #eff6ff; /* Soft blue alert container */
+  background: #eff6ff;
+  /* Soft blue alert container */
   border: 1px solid #bfdbfe;
   color: #1e40af;
 }
 
 /* Timeline Content Grid */
 .gridWrapper {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: calc(100vh - 200px);
   border-radius: 16px;
   border: 1px solid var(--border-color);
   background: var(--bg-grid);
@@ -170,7 +172,7 @@
   border-bottom: 2px solid var(--border-color);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -180,13 +182,30 @@
   justify-content: center;
   border-right: 1px solid var(--border-color);
   color: var(--text-secondary);
+  left: 0;
+  z-index: 20;
 }
 
 /* Platform Header Accents */
-.headerFb { border-bottom: 3px solid var(--color-fb); color: var(--color-fb); }
-.headerIg { border-bottom: 3px solid var(--color-ig); color: var(--color-ig); }
-.headerTt { border-bottom: 3px solid var(--color-tt); color: var(--color-tt); }
-.headerX { border-bottom: 3px solid var(--color-x); color: var(--color-x); }
+.headerFb {
+  border-bottom: 3px solid var(--color-fb);
+  color: var(--color-fb);
+}
+
+.headerIg {
+  border-bottom: 3px solid var(--color-ig);
+  color: var(--color-ig);
+}
+
+.headerTt {
+  border-bottom: 3px solid var(--color-tt);
+  color: var(--color-tt);
+}
+
+.headerX {
+  border-bottom: 3px solid var(--color-x);
+  color: var(--color-x);
+}
 
 /* Body Rows */
 .gridRow {
@@ -206,7 +225,9 @@
   color: var(--text-primary);
   border-right: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
-  position: relative;
+  position: sticky;
+  left: 0;
+  z-index: 5;
 }
 
 .gridCell {
@@ -326,10 +347,21 @@
 }
 
 /* Left Accent borders */
-.cardFb { border-left-color: var(--color-fb); }
-.cardIg { border-left-color: var(--color-ig); }
-.cardTt { border-left-color: var(--color-tt); }
-.cardX { border-left-color: var(--color-x); }
+.cardFb {
+  border-left-color: var(--color-fb);
+}
+
+.cardIg {
+  border-left-color: var(--color-ig);
+}
+
+.cardTt {
+  border-left-color: var(--color-tt);
+}
+
+.cardX {
+  border-left-color: var(--color-x);
+}
 
 .cardHeader {
   display: flex;
@@ -354,9 +386,20 @@
 }
 
 /* Types styles */
-.badgePost { background: var(--type-post-bg); color: var(--type-post-text); }
-.badgeReel { background: var(--type-reel-bg); color: var(--type-reel-text); }
-.badgeStory { background: var(--type-story-bg); color: var(--type-story-text); }
+.badgePost {
+  background: var(--type-post-bg);
+  color: var(--type-post-text);
+}
+
+.badgeReel {
+  background: var(--type-reel-bg);
+  color: var(--type-reel-text);
+}
+
+.badgeStory {
+  background: var(--type-story-bg);
+  color: var(--type-story-text);
+}
 
 /* Status styles */
 .statusBadge {
@@ -369,22 +412,28 @@
   border: 1px solid transparent;
 }
 
-.statusDraft {
-  background: var(--status-draft-bg);
-  color: var(--status-draft-text);
-  border-color: var(--status-draft-border);
+.statusPublicado {
+  background: var(--status-publicado-bg);
+  color: var(--status-publicado-text);
+  border-color: var(--status-publicado-border);
 }
 
-.statusScheduled {
-  background: var(--status-scheduled-bg);
-  color: var(--status-scheduled-text);
-  border-color: var(--status-scheduled-border);
+.statusNoPublicado {
+  background: var(--status-no-publicado-bg);
+  color: var(--status-no-publicado-text);
+  border-color: var(--status-no-publicado-border);
 }
 
-.statusPublished {
-  background: var(--status-published-bg);
-  color: var(--status-published-text);
-  border-color: var(--status-published-border);
+.statusProgramado {
+  background: var(--status-programado-bg);
+  color: var(--status-programado-text);
+  border-color: var(--status-programado-border);
+}
+
+.statusRechazado {
+  background: var(--status-rechazado-bg);
+  color: var(--status-rechazado-text);
+  border-color: var(--status-rechazado-border);
 }
 
 .cardBody {
@@ -477,12 +526,10 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(
-    to right, 
-    var(--col-yellow-flag) 0% 50%, 
-    var(--col-blue-flag) 50% 75%, 
-    var(--col-red-flag) 75% 100%
-  );
+  background: linear-gradient(to right,
+      var(--col-yellow-flag) 0% 50%,
+      var(--col-blue-flag) 50% 75%,
+      var(--col-red-flag) 75% 100%);
 }
 
 .modalTitle {
@@ -627,6 +674,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -638,16 +686,20 @@
   .header {
     padding: 16px;
   }
+
   .mainContent {
     padding: 16px;
     gap: 16px;
   }
+
   .gridWrapper {
     border-radius: 12px;
   }
+
   .formGrid {
     grid-template-columns: 1fr;
   }
+
   .fieldFull {
     grid-column: span 1;
   }
@@ -701,4 +753,3 @@
   display: inline-block;
   z-index: 5;
 }
-

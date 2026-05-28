@@ -49,17 +49,21 @@
   --color-x-glow: rgba(15, 23, 42, 0.06);
   
   /* Status Colors (aligned to Flag Colors where applicable) */
-  --status-draft-bg: #f1f5f9;
-  --status-draft-text: #475569;
-  --status-draft-border: #e2e8f0;
+  --status-publicado-bg: #dcfce7;
+  --status-publicado-text: #15803d;
+  --status-publicado-border: #bbf7d0;
   
-  --status-scheduled-bg: var(--col-yellow-light);
-  --status-scheduled-text: var(--col-yellow);
-  --status-scheduled-border: #fde68a;
-  
-  --status-published-bg: #dcfce7;
-  --status-published-text: #15803d;
-  --status-published-border: #bbf7d0;
+  --status-no-publicado-bg: #f1f5f9;
+  --status-no-publicado-text: #475569;
+  --status-no-publicado-border: #e2e8f0;
+
+  --status-programado-bg: var(--col-yellow-light);
+  --status-programado-text: var(--col-yellow);
+  --status-programado-border: #fde68a;
+
+  --status-rechazado-bg: #fee2e2;
+  --status-rechazado-text: #b91c1c;
+  --status-rechazado-border: #fecaca;
   
   /* Type Colors */
   --type-post-bg: #eef2ff;

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 
-import { ContentItem, HOURS, INITIAL_CONTENT, PLATFORMS, PlatformId } from '../../data/mockData';
+import { ContentItem, HOURS, PLATFORMS, PlatformId } from '../../data/mockData';
 import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
@@ -24,9 +24,11 @@ export default function DashboardPage() {
   const [formDuration, setFormDuration] = useState<number>(60);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
   const [formType, setFormType] = useState<'post' | 'reel' | 'story'>('post');
-  const [formStatus, setFormStatus] = useState<'draft' | 'scheduled' | 'published'>('draft');
+  const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado'>('Programado');
   const [formDescription, setFormDescription] = useState('');
   const [formUrl, setFormUrl] = useState('');
+  const [formComments, setFormComments] = useState('');
+  const [formKpi, setFormKpi] = useState('');
   const [viewItem, setViewItem] = useState<ContentItem | null>(null);
 
   useEffect(() => {
@@ -66,8 +68,8 @@ export default function DashboardPage() {
           if (saved) {
             setContentList(JSON.parse(saved));
           } else {
-            setContentList(INITIAL_CONTENT);
-            localStorage.setItem('dashboard_content_list', JSON.stringify(INITIAL_CONTENT));
+            setContentList([]);
+            localStorage.setItem('dashboard_content_list', JSON.stringify([]));
           }
         }
       } catch (e) {
@@ -76,8 +78,8 @@ export default function DashboardPage() {
         if (saved) {
           setContentList(JSON.parse(saved));
         } else {
-          setContentList(INITIAL_CONTENT);
-          localStorage.setItem('dashboard_content_list', JSON.stringify(INITIAL_CONTENT));
+          setContentList([]);
+          localStorage.setItem('dashboard_content_list', JSON.stringify([]));
         }
       }
     };
@@ -100,9 +102,11 @@ export default function DashboardPage() {
     setFormDuration(60);
     setFormPlatform(platform);
     setFormType('post');
-    setFormStatus('draft');
+    setFormStatus('Programado');
     setFormDescription('');
     setFormUrl('');
+    setFormComments('');
+    setFormKpi('');
     setIsModalOpen(true);
   };
 
@@ -115,9 +119,11 @@ export default function DashboardPage() {
     setFormDuration(item.duration || 60);
     setFormPlatform(item.platform);
     setFormType(item.type);
-    setFormStatus(item.status);
+    setFormStatus(item.status as any);
     setFormDescription(item.description);
     setFormUrl(item.url || '');
+    setFormComments(item.comments || '');
+    setFormKpi(item.kpi || '');
     setIsModalOpen(true);
   };
 
@@ -157,7 +163,9 @@ export default function DashboardPage() {
       status: formStatus,
       description: formDescription,
       duration: Number(formDuration),
-      url: formUrl
+      url: formUrl,
+      comments: formComments,
+      kpi: formKpi
     };
 
     if (formId) {
@@ -382,11 +390,11 @@ export default function DashboardPage() {
                                   </span>
                                 </div>
 
-                                <span className={`${styles.statusBadge} ${cellItem.status === 'published' ? styles.statusPublished :
-                                  cellItem.status === 'scheduled' ? styles.statusScheduled : styles.statusDraft
+                                <span className={`${styles.statusBadge} ${cellItem.status === 'Publicado' ? styles.statusPublicado :
+                                  cellItem.status === 'Programado' ? styles.statusProgramado : 
+                                  cellItem.status === 'Rechazado' ? styles.statusRechazado : styles.statusNoPublicado
                                   }`}>
-                                  {cellItem.time} - {cellItem.status === 'published' ? 'Pub' :
-                                    cellItem.status === 'scheduled' ? 'Prog' : 'Borr'}
+                                  {cellItem.time} - {cellItem.status}
                                 </span>
                               </div>
 
@@ -497,9 +505,13 @@ export default function DashboardPage() {
                       onChange={(e) => setFormMinute(e.target.value)}
                     >
                       <option value="00">00</option>
+                      <option value="10">10</option>
                       <option value="15">15</option>
+                      <option value="20">20</option>
                       <option value="30">30</option>
+                      <option value="40">40</option>
                       <option value="45">45</option>
+                      <option value="50">50</option>
                     </select>
                   </div>
 
@@ -511,11 +523,11 @@ export default function DashboardPage() {
                       value={formDuration}
                       onChange={(e) => setFormDuration(Number(e.target.value))}
                     >
+                      <option value={10}>10 minutos</option>
                       <option value={15}>15 minutos</option>
                       <option value={30}>30 minutos</option>
                       <option value={45}>45 minutos</option>
                       <option value={60}>60 minutos (1 hora)</option>
-                      <option value={120}>120 minutos (2 horas)</option>
                     </select>
                   </div>
 
@@ -553,12 +565,12 @@ export default function DashboardPage() {
                     <select
                       className={styles.modalInput}
                       value={formStatus}
-                      onChange={(e) => setFormStatus(e.target.value as 'draft' | 'scheduled' | 'published')}
+                      onChange={(e) => setFormStatus(e.target.value as 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado')}
                     >
                       <option value="Publicado">Publicado</option>
-                      <option value="Programado">No Publicado</option>
-                      <option value="scheduled">Programado</option>
-                      <option value="published">Rechazado</option>
+                      <option value="No Publicado">No Publicado</option>
+                      <option value="Programado">Programado</option>
+                      <option value="Rechazado">Rechazado</option>
                     </select>
                   </div>
 
@@ -582,6 +594,30 @@ export default function DashboardPage() {
                       placeholder="https://..."
                       value={formUrl}
                       onChange={(e) => setFormUrl(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Comments Field */}
+                  <div className={`${styles.field} ${styles.fieldFull}`}>
+                    <label className={styles.fieldLabel}>Comentarios de publicadores</label>
+                    <textarea
+                      className={styles.modalTextarea}
+                      style={{ minHeight: '80px' }}
+                      placeholder="Escribe aquí los comentarios..."
+                      value={formComments}
+                      onChange={(e) => setFormComments(e.target.value)}
+                    />
+                  </div>
+
+                  {/* KPI Field */}
+                  <div className={`${styles.field} ${styles.fieldFull}`}>
+                    <label className={styles.fieldLabel}>KPI objetivo</label>
+                    <input
+                      type="text"
+                      className={styles.modalInput}
+                      placeholder="Ej: 1000 likes, 500 clics..."
+                      value={formKpi}
+                      onChange={(e) => setFormKpi(e.target.value)}
                     />
                   </div>
                 </div>
@@ -631,10 +667,19 @@ export default function DashboardPage() {
               {viewItem.url && (
                 <p style={{ marginBottom: '0.5rem' }}><strong>URL:</strong> <a href={viewItem.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>{viewItem.url}</a></p>
               )}
+              {viewItem.kpi && (
+                <p style={{ marginBottom: '0.5rem' }}><strong>KPI objetivo:</strong> {viewItem.kpi}</p>
+              )}
               <div style={{ marginTop: '1rem', whiteSpace: 'pre-wrap', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
                 <strong>Descripción:</strong><br /><br />
                 {viewItem.description}
               </div>
+              {viewItem.comments && (
+                <div style={{ marginTop: '1rem', whiteSpace: 'pre-wrap', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
+                  <strong>Comentarios de publicadores:</strong><br /><br />
+                  {viewItem.comments}
+                </div>
+              )}
             </div>
             <div className={styles.modalFooter}>
               <button
