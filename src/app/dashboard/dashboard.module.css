@@ -878,6 +878,7 @@
   gap: 16px;
   border-top: 1.5px dashed var(--border-color);
   padding-top: 24px;
+  grid-column: span 2 !important;
 }
 
 .commentsTitle {
