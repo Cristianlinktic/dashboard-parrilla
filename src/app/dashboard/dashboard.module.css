@@ -509,6 +509,12 @@
   color: var(--type-quoted-text);
 }
 
+.badgeEspacio {
+  background: var(--type-espacio-bg);
+  color: var(--type-espacio-text);
+  border: 1px dashed var(--text-muted);
+}
+
 /* Status styles */
 .statusBadge {
   display: inline-flex;

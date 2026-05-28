@@ -24,7 +24,7 @@ export default function DashboardPage() {
   const [formMinute, setFormMinute] = useState('00');
   const [formDuration, setFormDuration] = useState<number>(10);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
-  const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados'>('post');
+  const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados' | 'Espacio reservado'>('post');
   const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido'>('Programado');
   const [formDescription, setFormDescription] = useState('');
   const [formUrl, setFormUrl] = useState('');
@@ -592,7 +592,8 @@ export default function DashboardPage() {
                                       cellItem.type === 'Story' ? styles.badgeStory :
                                         cellItem.type === 'Trino' ? styles.badgeTrino :
                                           cellItem.type === 'Trino + imagen' ? styles.badgeTrinoImg :
-                                            styles.badgeQuoted
+                                            cellItem.type === 'Espacio reservado' ? styles.badgeEspacio :
+                                              styles.badgeQuoted
                                     }`}>
                                     {cellItem.type}
                                   </span>
@@ -773,6 +774,7 @@ export default function DashboardPage() {
                       <option value="Trino">Trino</option>
                       <option value="Trino + imagen">Trino + imagen</option>
                       <option value="entrecomillados">entrecomillados</option>
+                      <option value="Espacio reservado">Espacio reservado</option>
                     </select>
                   </div>
 

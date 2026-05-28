@@ -9,7 +9,7 @@ export interface ContentItem {
   id: string;
   time: string; // format "HH:MM" from 07:00 to 22:59
   platform: 'facebook' | 'instagram' | 'tiktok' | 'x';
-  type: 'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados';
+  type: 'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados' | 'Espacio reservado';
   description: string;
   status: 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido';
   duration: number; // in minutes (e.g. 15, 30, 45, 60)
