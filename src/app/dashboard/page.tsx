@@ -22,7 +22,7 @@ export default function DashboardPage() {
   const [formId, setFormId] = useState('');
   const [formHour, setFormHour] = useState('07');
   const [formMinute, setFormMinute] = useState('00');
-  const [formDuration, setFormDuration] = useState<number>(15);
+  const [formDuration, setFormDuration] = useState<number>(10);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
   const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados'>('post');
   const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido'>('Programado');
@@ -175,7 +175,7 @@ export default function DashboardPage() {
     const [h, m] = time.split(':');
     setFormHour(h || '07');
     setFormMinute(m || '00');
-    setFormDuration(15);
+    setFormDuration(10);
     setFormPlatform(platform);
     setFormType('post');
     setFormStatus('Programado');
