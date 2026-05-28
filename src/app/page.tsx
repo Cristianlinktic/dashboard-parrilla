@@ -32,13 +32,16 @@ export default function LoginPage() {
 
     // Simulate network delay for premium feel
     setTimeout(() => {
-      if (password === 'editor123') {
+      const editorPass = process.env.NEXT_PUBLIC_EDITOR_PASS;
+      const viewerPass = process.env.NEXT_PUBLIC_VIEWER_PASS;
+
+      if (password === editorPass) {
         localStorage.setItem(
           'dashboard_session',
           JSON.stringify({ role: 'editor', timestamp: Date.now() })
         );
         router.push('/dashboard');
-      } else if (password === 'visual123') {
+      } else if (password === viewerPass) {
         localStorage.setItem(
           'dashboard_session',
           JSON.stringify({ role: 'viewer', timestamp: Date.now() })
