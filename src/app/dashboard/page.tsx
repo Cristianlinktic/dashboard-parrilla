@@ -71,7 +71,6 @@ export default function DashboardPage() {
       return;
     }
 
-    // Load content from Supabase, fallback to localStorage
     const loadContent = async () => {
       try {
         const { data, error } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
@@ -81,7 +80,6 @@ export default function DashboardPage() {
           setContentList(remoteContent);
           localStorage.setItem('dashboard_content_list', JSON.stringify(remoteContent));
         } else {
-          // No remote data, use localStorage or initial
           const saved = localStorage.getItem('dashboard_content_list');
           if (saved) {
             setContentList(JSON.parse(saved));
@@ -91,7 +89,6 @@ export default function DashboardPage() {
           }
         }
       } catch (e) {
-        // On any error, fallback to localStorage/initial
         const saved = localStorage.getItem('dashboard_content_list');
         if (saved) {
           setContentList(JSON.parse(saved));
@@ -101,9 +98,34 @@ export default function DashboardPage() {
         }
       }
     };
+
     loadContent();
 
-    return () => clearInterval(timer);
+    // Setup Realtime subscription
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'dashboard_content',
+          filter: 'id=eq.default'
+        },
+        (payload) => {
+          if (payload.new && (payload.new as any).content) {
+            const newContent = (payload.new as any).content as ContentItem[];
+            setContentList(newContent);
+            localStorage.setItem('dashboard_content_list', JSON.stringify(newContent));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      clearInterval(timer);
+      supabase.removeChannel(channel);
+    };
   }, [router]);
 
   useEffect(() => {
@@ -219,12 +241,17 @@ export default function DashboardPage() {
 
   const handleDeleteItem = async (id: string) => {
     if (role !== 'editor') return;
-    if (confirm('¿Estás seguro de que deseas eliminar esta publicación de la parrilla?')) {
-      const updatedList = contentList.filter(item => item.id !== id);
-      setContentList(updatedList);
-      localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-      setIsSaving(true);
+    if (!confirm('¿Estás seguro de que deseas eliminar esta publicación de la parrilla?')) return;
+    setIsSaving(true);
       try {
+        // Fetch latest to avoid overwriting others
+        const { data } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+        const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : contentList;
+        
+        const updatedList = latestContent.filter(item => item.id !== id);
+        
+        setContentList(updatedList);
+        localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
         await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
       } catch (e) {
         console.error('Supabase delete upsert error:', e);
@@ -232,7 +259,6 @@ export default function DashboardPage() {
       } finally {
         setIsSaving(false);
       }
-    }
   };
 
   const handleAddViewerComment = async (e: React.FormEvent) => {
@@ -253,26 +279,30 @@ export default function DashboardPage() {
       timestamp: timestamp
     };
 
-    const updatedItem = {
-      ...viewItem,
-      viewerComments: [...(viewItem.viewerComments || []), newComment]
-    };
-
-    const updatedList = contentList.map(item =>
-      item.id === viewItem.id ? updatedItem : item
-    );
-
-    // Save
-    setContentList(updatedList);
-    setViewItem(updatedItem);
-    localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-
-    // Clear form
-    setViewerCommentName('');
-    setViewerCommentText('');
-
     setIsSaving(true);
     try {
+      // Fetch latest to avoid overwriting others
+      const { data } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : contentList;
+
+      const updatedItem = {
+        ...viewItem,
+        viewerComments: [...(viewItem.viewerComments || []), newComment]
+      };
+
+      const updatedList = latestContent.map(item =>
+        item.id === viewItem.id ? updatedItem : item
+      );
+
+      // Save
+      setContentList(updatedList);
+      setViewItem(updatedItem);
+      localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
+
+      // Clear form
+      setViewerCommentName('');
+      setViewerCommentText('');
+
       await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
     } catch (e) {
       console.error('Error saving viewer comment:', e);
@@ -305,32 +335,27 @@ export default function DashboardPage() {
       kpi: formKpi
     };
 
-    if (formId) {
-      // Editing existing
-      updatedList = contentList.map(item =>
-        item.id === formId ? newItem : item
-      );
-    } else {
-      // Adding new
-      // Check if there is already an item with the exact same time/platform
-      const existsIndex = contentList.findIndex(item => item.time === timeStr && item.platform === formPlatform);
-      if (existsIndex > -1) {
-        if (!confirm(`Ya existe contenido programado para esta red social a las ${timeStr}. ¿Deseas reemplazarlo?`)) {
-          return;
-        }
-        updatedList = contentList.map((item, idx) =>
-          idx === existsIndex ? newItem : item
-        );
-      } else {
-        updatedList = [...contentList, newItem];
-      }
-    }
-
-    // Save updated list both locally and to Supabase
-    setContentList(updatedList);
-    localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
     setIsSaving(true);
     try {
+      // Fetch latest to avoid overwriting others
+      const { data } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : contentList;
+
+      let updatedList: ContentItem[] = [];
+
+      if (formId) {
+        // Editing existing
+        updatedList = latestContent.map(item =>
+          item.id === formId ? newItem : item
+        );
+      } else {
+        // Adding new
+        updatedList = [...latestContent, newItem];
+      }
+
+      // Save updated list both locally and to Supabase
+      setContentList(updatedList);
+      localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
       await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
     } catch (e) {
       console.error('Supabase upsert error:', e);
@@ -513,7 +538,7 @@ export default function DashboardPage() {
                           <div className={styles.indicatorLine} style={{ top: `${progressPercent}%` }} />
                         )}
 
-                        {cellItems.map(cellItem => {
+                        {cellItems.map((cellItem, index) => {
                           const startMin = parseInt(cellItem.time.split(':')[1], 10) || 0;
                           const topPercent = (startMin / 60) * 100;
                           const heightPercent = ((cellItem.duration || 60) / 60) * 100;
@@ -530,6 +555,8 @@ export default function DashboardPage() {
                               style={{
                                 top: `${topPercent}%`,
                                 height: `${heightPercent}%`,
+                                left: `${8 + (index * 4)}px`,
+                                zIndex: 10 + index,
                               }}
                               onMouseDown={(e) => handleDragStart(e, cellItem)}
                               onClick={(e) => {
