@@ -15,7 +15,7 @@
   top: 0;
   z-index: 50;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-header);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
@@ -195,7 +195,7 @@
 
 .gridHeaderCell {
   padding: 20px;
-  background: #f8fafc;
+  background: var(--bg-grid);
   font-weight: 700;
   font-size: 14px;
   text-align: left;
@@ -206,6 +206,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--text-primary);
 }
 
 .gridHeaderCellTime {
@@ -243,21 +244,41 @@
 }
 
 .timeCell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 12px;
-  background: #f8fafc;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--text-primary);
-  border-right: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
   position: sticky;
   left: 0;
   z-index: 5;
+  background: var(--bg-grid);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0;
+  height: 180px;
+}
+
+.timeIntervalsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.timeMainHour {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-align: center;
+  padding: 2px 0;
+}
+
+.timeMinute {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: center;
+  opacity: 0.7;
 }
 
 .gridCell {
@@ -329,7 +350,7 @@
 
 /* Card Styling - Absolute calendar positioning */
 .card {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 10px 12px;
@@ -773,12 +794,11 @@
 
 /* Google Calendar-like Current Time Line */
 .timeCellActive {
-  background: #fef3c7 !important;
-  color: var(--col-yellow) !important;
+  background: rgba(245, 158, 11, 0.12) !important;
 }
 
 .gridCellActive {
-  background-color: rgba(245, 158, 11, 0.01) !important;
+  background-color: rgba(245, 158, 11, 0.04) !important;
 }
 
 .indicatorLine {

@@ -8,6 +8,7 @@
   --bg-card-hover: #f1f5f9;
   --bg-modal: #ffffff;
   --bg-input: #f8fafc;
+  --bg-header: rgba(255, 255, 255, 0.85);
   
   --border-color: #e2e8f0; /* slate 200 */
   --border-hover: #cbd5e1; /* slate 300 */
@@ -59,24 +60,74 @@
 
   --status-programado-bg: var(--col-yellow-light);
   --status-programado-text: var(--col-yellow);
-  --status-programado-border: #fde68a;
-
-  --status-rechazado-bg: #fee2e2;
-  --status-rechazado-text: #b91c1c;
-  --status-rechazado-border: #fecaca;
+  --status-programado-border: var(--col-yellow);
   
-  /* Type Colors */
-  --type-post-bg: #eef2ff;
-  --type-post-text: #4f46e5;
+  --status-rechazado-bg: var(--col-red-light);
+  --status-rechazado-text: var(--col-red);
+  --status-rechazado-border: var(--col-red);
   
-  --type-reel-bg: #fdf2f8;
+  /* Types Colors */
+  --type-post-bg: #e2e8f0;
+  --type-post-text: #475569;
+  
+  --type-reel-bg: #fce7f3;
   --type-reel-text: #db2777;
   
-  --type-story-bg: #f5f3ff;
-  --type-story-text: #7c3aed;
+  --type-story-bg: #fef3c7;
+  --type-story-text: #d97706;
 
   /* Font */
   --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+[data-theme='dark'] {
+  --bg-main: #0f172a;
+  --bg-grid: #1e293b;
+  --bg-card: #1e293b;
+  --bg-card-hover: #334155;
+  --bg-modal: #1e293b;
+  --bg-input: #0f172a;
+  --bg-header: rgba(30, 41, 59, 0.85);
+  
+  --border-color: #334155;
+  --border-hover: #475569;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --bg-banner: rgba(254, 240, 138, 0.1);
+  --text-banner: #fde047;
+  --border-banner: #ca8a04;
+  --bg-banner-viewer: rgba(191, 219, 254, 0.1);
+  --text-banner-viewer: #93c5fd;
+  --border-banner-viewer: #3b82f6;
+
+  --color-tt: #f8fafc;
+  --color-x: #f8fafc;
+  
+  --status-publicado-bg: rgba(21, 128, 61, 0.2);
+  --status-publicado-text: #4ade80;
+  --status-publicado-border: #15803d;
+  
+  --status-no-publicado-bg: rgba(71, 85, 105, 0.2);
+  --status-no-publicado-text: #94a3b8;
+  --status-no-publicado-border: #475569;
+
+  --status-programado-bg: rgba(217, 119, 6, 0.2);
+  --status-programado-text: #fcd34d;
+  --status-programado-border: #d97706;
+
+  --status-rechazado-bg: rgba(220, 38, 38, 0.2);
+  --status-rechazado-text: #f87171;
+  --status-rechazado-border: #dc2626;
+
+  --type-post-bg: rgba(71, 85, 105, 0.2);
+  --type-post-text: #94a3b8;
+  --type-reel-bg: rgba(225, 48, 108, 0.2);
+  --type-reel-text: #f472b6;
+  --type-story-bg: rgba(245, 158, 11, 0.2);
+  --type-story-text: #fbbf24;
 }
 
 * {
