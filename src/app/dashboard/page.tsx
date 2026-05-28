@@ -22,7 +22,7 @@ export default function DashboardPage() {
   const [formId, setFormId] = useState('');
   const [formHour, setFormHour] = useState('07');
   const [formMinute, setFormMinute] = useState('00');
-  const [formDuration, setFormDuration] = useState<number>(60);
+  const [formDuration, setFormDuration] = useState<number>(15);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
   const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados'>('post');
   const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido'>('Programado');
@@ -175,7 +175,7 @@ export default function DashboardPage() {
     const [h, m] = time.split(':');
     setFormHour(h || '07');
     setFormMinute(m || '00');
-    setFormDuration(60);
+    setFormDuration(15);
     setFormPlatform(platform);
     setFormType('post');
     setFormStatus('Programado');
@@ -696,6 +696,10 @@ export default function DashboardPage() {
                       onChange={(e) => setFormDuration(Number(e.target.value))}
                     >
                       <option value={10}>10 minutos</option>
+                      <option value={15}>15 minutos</option>
+                      <option value={30}>30 minutos</option>
+                      <option value={45}>45 minutos</option>
+                      <option value={60}>60 minutos (1 hora)</option>
                     </select>
                   </div>
 
