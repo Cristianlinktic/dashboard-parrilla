@@ -660,27 +660,46 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className={styles.modalBody}>
-              <p style={{ marginBottom: '0.5rem' }}><strong>Red Social:</strong> <span style={{ textTransform: 'capitalize' }}>{viewItem.platform}</span></p>
-              <p style={{ marginBottom: '0.5rem' }}><strong>Hora:</strong> {viewItem.time}</p>
-              <p style={{ marginBottom: '0.5rem' }}><strong>Tipo:</strong> <span style={{ textTransform: 'capitalize' }}>{viewItem.type}</span></p>
-              <p style={{ marginBottom: '0.5rem' }}><strong>Estado:</strong> <span style={{ textTransform: 'capitalize' }}>{viewItem.status}</span></p>
-              <p style={{ marginBottom: '0.5rem' }}><strong>Duración:</strong> {viewItem.duration} minutos</p>
-              {viewItem.url && (
-                <p style={{ marginBottom: '0.5rem' }}><strong>URL:</strong> <a href={viewItem.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>{viewItem.url}</a></p>
-              )}
-              {viewItem.kpi && (
-                <p style={{ marginBottom: '0.5rem' }}><strong>KPI objetivo:</strong> {viewItem.kpi}</p>
-              )}
-              <div style={{ marginTop: '1rem', whiteSpace: 'pre-wrap', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
-                <strong>Descripción:</strong><br /><br />
-                {viewItem.description}
-              </div>
-              {viewItem.comments && (
-                <div style={{ marginTop: '1rem', whiteSpace: 'pre-wrap', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
-                  <strong>Comentarios de publicadores:</strong><br /><br />
-                  {viewItem.comments}
+              <div className={styles.infoGrid}>
+                <div className={styles.infoBox}>
+                  <span className={styles.infoLabel}>Red Social</span>
+                  <span className={styles.infoValue} style={{ textTransform: 'capitalize' }}>{viewItem.platform}</span>
                 </div>
-              )}
+                <div className={styles.infoBox}>
+                  <span className={styles.infoLabel}>Hora</span>
+                  <span className={styles.infoValue}>{viewItem.time}</span>
+                </div>
+                <div className={styles.infoBox}>
+                  <span className={styles.infoLabel}>Tipo</span>
+                  <span className={styles.infoValue} style={{ textTransform: 'capitalize' }}>{viewItem.type}</span>
+                </div>
+                <div className={styles.infoBox}>
+                  <span className={styles.infoLabel}>Estado</span>
+                  <span className={styles.infoValue} style={{ textTransform: 'capitalize' }}>{viewItem.status}</span>
+                </div>
+                {viewItem.url && (
+                  <div className={`${styles.infoBox} ${styles.infoBoxFull}`}>
+                    <span className={styles.infoLabel}>Link de piezas</span>
+                    <a href={viewItem.url} target="_blank" rel="noopener noreferrer" className={styles.infoValue} style={{ color: 'var(--col-blue)', textDecoration: 'underline' }}>{viewItem.url}</a>
+                  </div>
+                )}
+                {viewItem.kpi && (
+                  <div className={`${styles.infoBox} ${styles.infoBoxFull}`}>
+                    <span className={styles.infoLabel}>KPI objetivo</span>
+                    <span className={styles.infoValue}>{viewItem.kpi}</span>
+                  </div>
+                )}
+                <div className={`${styles.infoBox} ${styles.infoBoxFull}`} style={{ backgroundColor: 'rgba(248,250,252,0.5)' }}>
+                  <span className={styles.infoLabel}>Copy del contenido</span>
+                  <span className={styles.infoValue} style={{ whiteSpace: 'pre-wrap', marginTop: '4px' }}>{viewItem.description}</span>
+                </div>
+                {viewItem.comments && (
+                  <div className={`${styles.infoBox} ${styles.infoBoxFull}`} style={{ backgroundColor: 'rgba(254,243,199,0.3)' }}>
+                    <span className={styles.infoLabel}>Comentarios de publicadores</span>
+                    <span className={styles.infoValue} style={{ whiteSpace: 'pre-wrap', marginTop: '4px' }}>{viewItem.comments}</span>
+                  </div>
+                )}
+              </div>
             </div>
             <div className={styles.modalFooter}>
               <button
