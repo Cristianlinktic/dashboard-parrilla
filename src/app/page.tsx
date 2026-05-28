@@ -69,7 +69,6 @@ export default function LoginPage() {
 
         <div className={styles.header}>
           <h1 className={styles.title}>ContentPanel</h1>
-          <p className={styles.subtitle}>Evento de la Misión de Observación Internacional</p>
         </div>
 
         <form onSubmit={handleSubmit}>
