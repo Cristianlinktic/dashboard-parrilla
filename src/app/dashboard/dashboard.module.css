@@ -515,6 +515,12 @@
   border-color: var(--status-rechazado-border);
 }
 
+.statusPorCrear {
+  background: var(--status-por-crear-bg);
+  color: var(--status-por-crear-text);
+  border-color: var(--status-por-crear-border);
+}
+
 .cardBody {
   font-size: 13px;
   line-height: 1.5;

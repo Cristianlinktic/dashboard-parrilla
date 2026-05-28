@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const [formDuration, setFormDuration] = useState<number>(60);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
   const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados'>('post');
-  const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado'>('Programado');
+  const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido'>('Programado');
   const [formDescription, setFormDescription] = useState('');
   const [formUrl, setFormUrl] = useState('');
   const [formComments, setFormComments] = useState('');
@@ -558,7 +558,9 @@ export default function DashboardPage() {
 
                                 <span className={`${styles.statusBadge} ${cellItem.status === 'Publicado' ? styles.statusPublicado :
                                   cellItem.status === 'Programado' ? styles.statusProgramado :
-                                    cellItem.status === 'Rechazado' ? styles.statusRechazado : styles.statusNoPublicado
+                                    cellItem.status === 'Rechazado' ? styles.statusRechazado :
+                                      cellItem.status === 'Por crear contenido' ? styles.statusPorCrear :
+                                        styles.statusNoPublicado
                                   }`}>
                                   {cellItem.time} - {cellItem.status}
                                 </span>
@@ -734,12 +736,13 @@ export default function DashboardPage() {
                     <select
                       className={styles.modalInput}
                       value={formStatus}
-                      onChange={(e) => setFormStatus(e.target.value as 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado')}
+                      onChange={(e) => setFormStatus(e.target.value as 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido')}
                     >
                       <option value="Publicado">Publicado</option>
                       <option value="No Publicado">No Publicado</option>
                       <option value="Programado">Programado</option>
                       <option value="Rechazado">Rechazado</option>
+                      <option value="Por crear contenido">Por crear contenido</option>
                     </select>
                   </div>
 

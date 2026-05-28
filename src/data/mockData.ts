@@ -11,7 +11,7 @@ export interface ContentItem {
   platform: 'facebook' | 'instagram' | 'tiktok' | 'x';
   type: 'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados';
   description: string;
-  status: 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado';
+  status: 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido';
   duration: number; // in minutes (e.g. 15, 30, 45, 60)
   url?: string;
   comments?: string;

@@ -79,6 +79,10 @@
   --status-rechazado-text: var(--col-red);
   --status-rechazado-border: var(--col-red);
 
+  --status-por-crear-bg: #f5f3ff;
+  --status-por-crear-text: #6d28d9;
+  --status-por-crear-border: #ddd6fe;
+
   /* Types Colors */
   --type-reel-bg: #22c55e;
   --type-reel-text: #ffffff;
@@ -143,6 +147,10 @@
   --status-rechazado-bg: rgba(220, 38, 38, 0.2);
   --status-rechazado-text: #f87171;
   --status-rechazado-border: #dc2626;
+
+  --status-por-crear-bg: rgba(109, 40, 217, 0.2);
+  --status-por-crear-text: #a78bfa;
+  --status-por-crear-border: #6d28d9;
 
   --type-reel-bg: rgba(34, 197, 94, 0.25);
   --type-reel-text: #4ade80;
