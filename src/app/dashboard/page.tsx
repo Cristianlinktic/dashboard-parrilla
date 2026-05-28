@@ -538,6 +538,19 @@ export default function DashboardPage() {
                           <div className={styles.indicatorLine} style={{ top: `${progressPercent}%` }} />
                         )}
 
+                        {role === 'editor' && (
+                          <button
+                            className={styles.cellAddBtn}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenAddModal(hour, plat.id);
+                            }}
+                            title="Añadir otro contenido a esta hora"
+                          >
+                            +
+                          </button>
+                        )}
+
                         {cellItems.map((cellItem, index) => {
                           const startMin = parseInt(cellItem.time.split(':')[1], 10) || 0;
                           const topPercent = (startMin / 60) * 100;
@@ -635,9 +648,9 @@ export default function DashboardPage() {
                           );
                         })}
 
-                        {/* Empty cell indicator (only if no items in slot at all and Editor) */}
-                        {cellItems.length === 0 && role === 'editor' && (
-                          <div className={styles.addPlaceholder}>
+                        {/* Empty cell indicator (Always show if Editor to allow multiple) */}
+                        {role === 'editor' && (
+                          <div className={styles.addPlaceholder} style={{ zIndex: 1 }}>
                             <span className={styles.addPlaceholderIcon}>+</span>
                             <span className={styles.addPlaceholderText}>Agregar</span>
                           </div>
@@ -836,8 +849,21 @@ export default function DashboardPage() {
                 >
                   Cancelar
                 </button>
+                {formId && (
+                  <button
+                    type="button"
+                    className={styles.btnSaveNew}
+                    onClick={(e) => {
+                      setFormId('');
+                      handleSaveItem(e);
+                    }}
+                    title="Crea una copia de este contenido en lugar de editar el original"
+                  >
+                    Guardar como nuevo
+                  </button>
+                )}
                 <button type="submit" className={styles.btnSave}>
-                  Guardar Cambios
+                  {formId ? 'Guardar Cambios' : 'Guardar en Parrilla'}
                 </button>
               </div>
             </form>

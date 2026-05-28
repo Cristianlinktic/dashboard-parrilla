@@ -348,6 +348,37 @@
   letter-spacing: 0.05em;
 }
 
+.cellAddBtn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--col-blue);
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 40;
+  opacity: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gridCell:hover .cellAddBtn {
+  opacity: 1;
+}
+
+.cellAddBtn:hover {
+  transform: scale(1.15);
+  background: var(--accent-hover);
+}
+
 /* Card Styling - Absolute calendar positioning */
 .card {
   background: var(--bg-card);
@@ -783,6 +814,23 @@
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(29, 78, 216, 0.15);
   transition: all 0.2s ease;
+}
+
+.btnSaveNew {
+  background: #fff;
+  border: 1px solid var(--col-blue);
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--col-blue);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSaveNew:hover {
+  background: var(--col-blue-light);
+  transform: translateY(-1px);
 }
 
 .btnSave:hover {
