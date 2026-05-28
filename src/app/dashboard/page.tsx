@@ -31,7 +31,7 @@ export default function DashboardPage() {
   const [formComments, setFormComments] = useState('');
   const [formKpi, setFormKpi] = useState('');
   const [viewItem, setViewItem] = useState<ContentItem | null>(null);
-  
+
   // Dragging states
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragStartY, setDragStartY] = useState<number>(0);
@@ -207,7 +207,7 @@ export default function DashboardPage() {
     if (role !== 'editor') return;
     // Solo arrastrar con click izquierdo
     if (e.button !== 0) return;
-    
+
     // Evitar que el drag empiece si hacemos click en botones de acción
     if ((e.target as HTMLElement).closest('button')) return;
 
@@ -266,7 +266,7 @@ export default function DashboardPage() {
     setContentList(updatedList);
     setViewItem(updatedItem);
     localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-    
+
     // Clear form
     setViewerCommentName('');
     setViewerCommentText('');
@@ -535,7 +535,7 @@ export default function DashboardPage() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (hasMoved) return; // Si se movió (drag), no abrir modal
-                                
+
                                 if (role === 'editor') {
                                   handleOpenEditModal(cellItem);
                                 } else {
@@ -646,7 +646,7 @@ export default function DashboardPage() {
                 <div className={styles.formGrid}>
                   {/* Hour and Minute fields */}
                   <div className={styles.field}>
-                    <label className={styles.fieldLabel}>Hora (Inicio)</label>
+                    <label className={styles.fieldLabel}>Hora Publicación</label>
                     <select
                       className={styles.modalInput}
                       value={formHour}
@@ -654,26 +654,30 @@ export default function DashboardPage() {
                     >
                       {HOURS.map(h => {
                         const hr = h.split(':')[0];
-                        return <option key={hr} value={hr}>{hr}:xx</option>;
+                        return <option key={hr} value={hr}>{hr}:</option>;
                       })}
                     </select>
                   </div>
 
                   <div className={styles.field}>
-                    <label className={styles.fieldLabel}>Minuto (Inicio)</label>
+                    <label className={styles.fieldLabel}>Minuto Publicación</label>
                     <select
                       className={styles.modalInput}
                       value={formMinute}
                       onChange={(e) => setFormMinute(e.target.value)}
                     >
                       <option value="00">00</option>
+                      <option value="05">05</option>
                       <option value="10">10</option>
                       <option value="15">15</option>
                       <option value="20">20</option>
+                      <option value="25">25</option>
                       <option value="30">30</option>
+                      <option value="35">35</option>
                       <option value="40">40</option>
                       <option value="45">45</option>
                       <option value="50">50</option>
+                      <option value="55">55</option>
                     </select>
                   </div>
 
@@ -686,10 +690,6 @@ export default function DashboardPage() {
                       onChange={(e) => setFormDuration(Number(e.target.value))}
                     >
                       <option value={10}>10 minutos</option>
-                      <option value={15}>15 minutos</option>
-                      <option value={30}>30 minutos</option>
-                      <option value={45}>45 minutos</option>
-                      <option value={60}>60 minutos (1 hora)</option>
                     </select>
                   </div>
 
@@ -736,6 +736,18 @@ export default function DashboardPage() {
                     </select>
                   </div>
 
+                  {/* KPI Field */}
+                  <div className={`${styles.field} ${styles.fieldFull}`}>
+                    <label className={styles.fieldLabel}>KPI objetivo</label>
+                    <input
+                      type="text"
+                      className={styles.modalInput}
+                      placeholder="Ej: 1000 likes, 500 clics..."
+                      value={formKpi}
+                      onChange={(e) => setFormKpi(e.target.value)}
+                    />
+                  </div>
+
                   {/* Content Textarea */}
                   <div className={`${styles.field} ${styles.fieldFull}`}>
                     <label className={styles.fieldLabel}>Copy del contenido</label>
@@ -771,17 +783,6 @@ export default function DashboardPage() {
                     />
                   </div>
 
-                  {/* KPI Field */}
-                  <div className={`${styles.field} ${styles.fieldFull}`}>
-                    <label className={styles.fieldLabel}>KPI objetivo</label>
-                    <input
-                      type="text"
-                      className={styles.modalInput}
-                      placeholder="Ej: 1000 likes, 500 clics..."
-                      value={formKpi}
-                      onChange={(e) => setFormKpi(e.target.value)}
-                    />
-                  </div>
                 </div>
 
               </div>
