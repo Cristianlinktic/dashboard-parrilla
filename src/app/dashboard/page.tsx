@@ -568,7 +568,9 @@ export default function DashboardPage() {
                               style={{
                                 top: `${topPercent}%`,
                                 height: `${heightPercent}%`,
-                                left: `${8 + (index * 4)}px`,
+                                left: `${(index / cellItems.length) * 100}%`,
+                                width: `${100 / cellItems.length}%`,
+                                padding: cellItems.length > 1 ? '6px 4px' : '10px 12px',
                                 zIndex: 10 + index,
                               }}
                               onMouseDown={(e) => handleDragStart(e, cellItem)}

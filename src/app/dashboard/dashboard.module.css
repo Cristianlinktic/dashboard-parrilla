@@ -391,8 +391,6 @@
   justify-content: space-between;
   border-left-width: 4px;
   position: absolute;
-  left: 8px;
-  right: 8px;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
