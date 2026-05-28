@@ -1,3 +1,10 @@
+export interface ViewerComment {
+  id: string;
+  name: string;
+  comment: string;
+  timestamp: string;
+}
+
 export interface ContentItem {
   id: string;
   time: string; // format "HH:MM" from 07:00 to 22:59
@@ -9,6 +16,7 @@ export interface ContentItem {
   url?: string;
   comments?: string;
   kpi?: string;
+  viewerComments?: ViewerComment[];
 }
 
 export const HOURS = [

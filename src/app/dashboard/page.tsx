@@ -31,6 +31,16 @@ export default function DashboardPage() {
   const [formComments, setFormComments] = useState('');
   const [formKpi, setFormKpi] = useState('');
   const [viewItem, setViewItem] = useState<ContentItem | null>(null);
+  
+  // Dragging states
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragStartY, setDragStartY] = useState<number>(0);
+  const [dragStartTime, setDragStartTime] = useState<string>('07:00');
+  const [hasMoved, setHasMoved] = useState(false);
+
+  // Viewer comment states
+  const [viewerCommentName, setViewerCommentName] = useState('');
+  const [viewerCommentText, setViewerCommentText] = useState('');
 
   useEffect(() => {
     setIsMounted(true);
@@ -96,6 +106,57 @@ export default function DashboardPage() {
     return () => clearInterval(timer);
   }, [router]);
 
+  useEffect(() => {
+    if (!draggingId || role !== 'editor') return;
+
+    const onMouseMove = (e: MouseEvent) => {
+      setHasMoved(true);
+      const deltaY = e.clientY - dragStartY;
+      const deltaMinutes = Math.round(deltaY / 3); // 180px/60min = 3px/min
+
+      const [h, m] = dragStartTime.split(':').map(Number);
+      let totalMinutes = h * 60 + m + deltaMinutes;
+
+      // Restricciones de horario según mockData.ts (07:00 - 22:59 aprox)
+      totalMinutes = Math.max(7 * 60, Math.min(22 * 60 + 59, totalMinutes));
+
+      // Snap a cada 5 minutos para que sea más fácil de ubicar
+      totalMinutes = Math.round(totalMinutes / 5) * 5;
+
+      const newH = Math.floor(totalMinutes / 60);
+      const newM = totalMinutes % 60;
+      const newTime = `${newH.toString().padStart(2, '0')}:${newM.toString().padStart(2, '0')}`;
+
+      setContentList(prev => prev.map(item =>
+        item.id === draggingId ? { ...item, time: newTime } : item
+      ));
+    };
+
+    const onMouseUp = async () => {
+      setDraggingId(null);
+      // Persistir el cambio final
+      const currentListValue = JSON.parse(localStorage.getItem('dashboard_content_list') || '[]');
+      // Nota: we use the functional update 'prev' in contentList, but here we can just use the state
+      // because it's been updated by onMouseMove. However, setContentList is async.
+      // To be safe, we can use the current contentList state if we're sure it's updated.
+      // Since it's in the dependency array, it should be fine.
+      localStorage.setItem('dashboard_content_list', JSON.stringify(contentList));
+      try {
+        await supabase.from('dashboard_content').upsert({ id: 'default', content: contentList });
+      } catch (e) {
+        console.error('Error auto-saving after drag:', e);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [draggingId, dragStartY, dragStartTime, contentList, role]);
+
   const handleLogout = () => {
     localStorage.removeItem('dashboard_session');
     router.push('/');
@@ -142,6 +203,20 @@ export default function DashboardPage() {
     setIsModalOpen(true);
   };
 
+  const handleDragStart = (e: React.MouseEvent, item: ContentItem) => {
+    if (role !== 'editor') return;
+    // Solo arrastrar con click izquierdo
+    if (e.button !== 0) return;
+    
+    // Evitar que el drag empiece si hacemos click en botones de acción
+    if ((e.target as HTMLElement).closest('button')) return;
+
+    setDraggingId(item.id);
+    setDragStartY(e.clientY);
+    setDragStartTime(item.time);
+    setHasMoved(false);
+  };
+
   const handleDeleteItem = async (id: string) => {
     if (role !== 'editor') return;
     if (confirm('¿Estás seguro de que deseas eliminar esta publicación de la parrilla?')) {
@@ -157,6 +232,53 @@ export default function DashboardPage() {
       } finally {
         setIsSaving(false);
       }
+    }
+  };
+
+  const handleAddViewerComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!viewItem) return;
+    if (!viewerCommentName.trim() || !viewerCommentText.trim()) {
+      alert('Por favor, ingresa tu nombre y un comentario.');
+      return;
+    }
+
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    const newComment = {
+      id: Date.now().toString(),
+      name: viewerCommentName,
+      comment: viewerCommentText,
+      timestamp: timestamp
+    };
+
+    const updatedItem = {
+      ...viewItem,
+      viewerComments: [...(viewItem.viewerComments || []), newComment]
+    };
+
+    const updatedList = contentList.map(item =>
+      item.id === viewItem.id ? updatedItem : item
+    );
+
+    // Save
+    setContentList(updatedList);
+    setViewItem(updatedItem);
+    localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
+    
+    // Clear form
+    setViewerCommentName('');
+    setViewerCommentText('');
+
+    setIsSaving(true);
+    try {
+      await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+    } catch (e) {
+      console.error('Error saving viewer comment:', e);
+      setErrorMsg('Error al guardar comentario en la nube.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -404,13 +526,16 @@ export default function DashboardPage() {
                               className={`${styles.card} ${isShort ? styles.cardShort : ''} glass ${plat.id === 'facebook' ? styles.cardFb :
                                 plat.id === 'instagram' ? styles.cardIg :
                                   plat.id === 'tiktok' ? styles.cardTt : styles.cardX
-                                }`}
+                                } ${role === 'editor' ? styles.cardEditor : ''} ${draggingId === cellItem.id ? styles.cardDragging : ''}`}
                               style={{
                                 top: `${topPercent}%`,
                                 height: `${heightPercent}%`,
                               }}
+                              onMouseDown={(e) => handleDragStart(e, cellItem)}
                               onClick={(e) => {
                                 e.stopPropagation();
+                                if (hasMoved) return; // Si se movió (drag), no abrir modal
+                                
                                 if (role === 'editor') {
                                   handleOpenEditModal(cellItem);
                                 } else {
@@ -735,6 +860,60 @@ export default function DashboardPage() {
                     <span className={styles.infoValue} style={{ whiteSpace: 'pre-wrap', marginTop: '4px' }}>{viewItem.comments}</span>
                   </div>
                 )}
+
+                {/* Seccion de Comentarios de Visualizadores */}
+                <div className={styles.commentsSection}>
+                  <h3 className={styles.commentsTitle}>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                    Comentarios y Observaciones
+                  </h3>
+
+                  <div className={styles.commentList}>
+                    {(!viewItem.viewerComments || viewItem.viewerComments.length === 0) ? (
+                      <p className={styles.noComments}>No hay comentarios aún. ¡Sé el primero en opinar!</p>
+                    ) : (
+                      viewItem.viewerComments.map(c => (
+                        <div key={c.id} className={styles.commentItem}>
+                          <div className={styles.commentHeader}>
+                            <span className={styles.commentUser}>{c.name}</span>
+                            <span className={styles.commentTime}>{c.timestamp}</span>
+                          </div>
+                          <p className={styles.commentText}>{c.comment}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Formulario para agregar comentario */}
+                  <form onSubmit={handleAddViewerComment} className={styles.addCommentForm}>
+                    <div className={styles.commentInputGroup}>
+                      <label className={styles.fieldLabel}>Tu Nombre</label>
+                      <input
+                        type="text"
+                        className={styles.modalInput}
+                        placeholder="Quien comenta..."
+                        value={viewerCommentName}
+                        onChange={(e) => setViewerCommentName(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.commentInputGroup}>
+                      <label className={styles.fieldLabel}>Observación o Comentario</label>
+                      <textarea
+                        className={styles.modalInput}
+                        style={{ minHeight: '60px', resize: 'vertical' }}
+                        placeholder="Escribe aquí tu observación..."
+                        value={viewerCommentText}
+                        onChange={(e) => setViewerCommentText(e.target.value)}
+                      />
+                    </div>
+                    <button type="submit" className={styles.btnSubmitComment}>
+                      Enviar Comentario
+                    </button>
+                  </form>
+                </div>
+
               </div>
             </div>
             <div className={styles.modalFooter}>
