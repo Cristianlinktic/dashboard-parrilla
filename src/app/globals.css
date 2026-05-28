@@ -2,58 +2,71 @@
 
 :root {
   /* System Design Tokens - Light Theme with Colombian flag accents */
-  --bg-main: #f8fafc; /* light slate */
+  --bg-main: #f8fafc;
+  /* light slate */
   --bg-grid: #ffffff;
   --bg-card: #ffffff;
   --bg-card-hover: #f1f5f9;
   --bg-modal: #ffffff;
   --bg-input: #f8fafc;
   --bg-header: rgba(255, 255, 255, 0.85);
-  
-  --border-color: #e2e8f0; /* slate 200 */
-  --border-hover: #cbd5e1; /* slate 300 */
-  --border-focus: #1d4ed8; /* cobalt blue */
-  
-  --text-primary: #0f172a; /* slate 900 */
-  --text-secondary: #475569; /* slate 600 */
-  --text-muted: #94a3b8; /* slate 400 */
-  
+
+  --border-color: #e2e8f0;
+  /* slate 200 */
+  --border-hover: #cbd5e1;
+  /* slate 300 */
+  --border-focus: #1d4ed8;
+  /* cobalt blue */
+
+  --text-primary: #0f172a;
+  /* slate 900 */
+  --text-secondary: #475569;
+  /* slate 600 */
+  --text-muted: #94a3b8;
+  /* slate 400 */
+
   /* Colombian Flag Colors (Premium and Readable Tones) */
-  --col-yellow: #d97706; /* rich gold/amber for readability */
-  --col-yellow-flag: #ffcd00; /* true yellow flag color */
+  --col-yellow: #d97706;
+  /* rich gold/amber for readability */
+  --col-yellow-flag: #ffcd00;
+  /* true yellow flag color */
   --col-yellow-light: #fef3c7;
-  
-  --col-blue: #1d4ed8; /* strong cobalt blue */
-  --col-blue-flag: #003087; /* true blue flag color */
+
+  --col-blue: #1d4ed8;
+  /* strong cobalt blue */
+  --col-blue-flag: #003087;
+  /* true blue flag color */
   --col-blue-light: #dbeafe;
-  
-  --col-red: #dc2626; /* vibrant crimson red */
-  --col-red-flag: #c8102e; /* true red flag color */
+
+  --col-red: #dc2626;
+  /* vibrant crimson red */
+  --col-red-flag: #c8102e;
+  /* true red flag color */
   --col-red-light: #fee2e2;
-  
+
   --accent: var(--col-blue);
   --accent-hover: #1e40af;
   --accent-glow: rgba(29, 78, 216, 0.06);
-  
+
   /* Platform Colors */
   --color-fb: #1877f2;
   --color-fb-glow: rgba(24, 119, 242, 0.08);
-  
+
   --color-ig: #e1306c;
   --color-ig-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
   --color-ig-glow: rgba(225, 48, 108, 0.08);
-  
+
   --color-tt: #0f172a;
   --color-tt-glow: rgba(15, 23, 42, 0.06);
-  
+
   --color-x: #0f172a;
   --color-x-glow: rgba(15, 23, 42, 0.06);
-  
+
   /* Status Colors (aligned to Flag Colors where applicable) */
   --status-publicado-bg: #dcfce7;
   --status-publicado-text: #15803d;
   --status-publicado-border: #bbf7d0;
-  
+
   --status-no-publicado-bg: #f1f5f9;
   --status-no-publicado-text: #475569;
   --status-no-publicado-border: #e2e8f0;
@@ -61,18 +74,18 @@
   --status-programado-bg: var(--col-yellow-light);
   --status-programado-text: var(--col-yellow);
   --status-programado-border: var(--col-yellow);
-  
+
   --status-rechazado-bg: var(--col-red-light);
   --status-rechazado-text: var(--col-red);
   --status-rechazado-border: var(--col-red);
-  
+
   /* Types Colors */
   --type-post-bg: #e2e8f0;
   --type-post-text: #475569;
-  
+
   --type-reel-bg: #fce7f3;
   --type-reel-text: #db2777;
-  
+
   --type-story-bg: #fef3c7;
   --type-story-text: #d97706;
 
@@ -88,10 +101,10 @@
   --bg-modal: #1e293b;
   --bg-input: #0f172a;
   --bg-header: rgba(30, 41, 59, 0.85);
-  
+
   --border-color: #334155;
   --border-hover: #475569;
-  
+
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -105,11 +118,11 @@
 
   --color-tt: #f8fafc;
   --color-x: #f8fafc;
-  
+
   --status-publicado-bg: rgba(21, 128, 61, 0.2);
   --status-publicado-text: #4ade80;
   --status-publicado-border: #15803d;
-  
+
   --status-no-publicado-bg: rgba(71, 85, 105, 0.2);
   --status-no-publicado-text: #94a3b8;
   --status-no-publicado-border: #475569;
@@ -143,13 +156,16 @@
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.15);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.25);
 }
@@ -171,7 +187,7 @@ body::before {
   left: -10%;
   width: 120%;
   height: 120%;
-  background: 
+  background:
     radial-gradient(circle at 15% 15%, rgba(255, 205, 0, 0.07) 0%, transparent 45%),
     radial-gradient(circle at 85% 50%, rgba(0, 48, 135, 0.05) 0%, transparent 45%),
     radial-gradient(circle at 50% 85%, rgba(200, 16, 46, 0.04) 0%, transparent 50%);
@@ -184,7 +200,10 @@ a {
   text-decoration: none;
 }
 
-input, select, textarea, button {
+input,
+select,
+textarea,
+button {
   font-family: inherit;
   color: inherit;
 }
@@ -210,6 +229,11 @@ input, select, textarea, button {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
