@@ -6,6 +6,7 @@ export interface ContentItem {
   description: string;
   status: 'draft' | 'scheduled' | 'published';
   duration: number; // in minutes (e.g. 15, 30, 45, 60)
+  url?: string;
 }
 
 export const HOURS = [

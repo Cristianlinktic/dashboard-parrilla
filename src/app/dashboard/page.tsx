@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const [contentList, setContentList] = useState<ContentItem[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formId, setFormId] = useState('');
@@ -26,6 +26,8 @@ export default function DashboardPage() {
   const [formType, setFormType] = useState<'post' | 'reel' | 'story'>('post');
   const [formStatus, setFormStatus] = useState<'draft' | 'scheduled' | 'published'>('draft');
   const [formDescription, setFormDescription] = useState('');
+  const [formUrl, setFormUrl] = useState('');
+  const [viewItem, setViewItem] = useState<ContentItem | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -100,6 +102,7 @@ export default function DashboardPage() {
     setFormType('post');
     setFormStatus('draft');
     setFormDescription('');
+    setFormUrl('');
     setIsModalOpen(true);
   };
 
@@ -114,6 +117,7 @@ export default function DashboardPage() {
     setFormType(item.type);
     setFormStatus(item.status);
     setFormDescription(item.description);
+    setFormUrl(item.url || '');
     setIsModalOpen(true);
   };
 
@@ -152,12 +156,13 @@ export default function DashboardPage() {
       type: formType,
       status: formStatus,
       description: formDescription,
-      duration: Number(formDuration)
+      duration: Number(formDuration),
+      url: formUrl
     };
 
     if (formId) {
       // Editing existing
-      updatedList = contentList.map(item => 
+      updatedList = contentList.map(item =>
         item.id === formId ? newItem : item
       );
     } else {
@@ -168,7 +173,7 @@ export default function DashboardPage() {
         if (!confirm(`Ya existe contenido programado para esta red social a las ${timeStr}. ¿Deseas reemplazarlo?`)) {
           return;
         }
-        updatedList = contentList.map((item, idx) => 
+        updatedList = contentList.map((item, idx) =>
           idx === existsIndex ? newItem : item
         );
       } else {
@@ -179,15 +184,15 @@ export default function DashboardPage() {
     // Save updated list both locally and to Supabase
     setContentList(updatedList);
     localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-        setIsSaving(true);
-        try {
-          await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-        } catch (e) {
-          console.error('Supabase upsert error:', e);
-          setErrorMsg('Error al guardar en la nube.');
-        } finally {
-          setIsSaving(false);
-        }
+    setIsSaving(true);
+    try {
+      await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+    } catch (e) {
+      console.error('Supabase upsert error:', e);
+      setErrorMsg('Error al guardar en la nube.');
+    } finally {
+      setIsSaving(false);
+    }
     setIsModalOpen(false);
   };
 
@@ -209,7 +214,7 @@ export default function DashboardPage() {
           </h1>
           <span className={styles.eventSubtitle}>Parrilla de Contenidos del Evento</span>
         </div>
-        
+
         <div className={styles.headerActions}>
           {role === 'editor' ? (
             <span className={`${styles.roleBadge} ${styles.roleEditor}`}>
@@ -222,7 +227,7 @@ export default function DashboardPage() {
               Modo Visualizador 👁️
             </span>
           )}
-          
+
           <button onClick={handleLogout} className={styles.logoutBtn}>
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
@@ -255,7 +260,7 @@ export default function DashboardPage() {
         {/* Content Parrilla Grid */}
         <div className={styles.gridWrapper}>
           <div className={styles.grid}>
-            
+
             {/* Header Columns */}
             <div className={styles.gridHeader}>
               <div className={`${styles.gridHeaderCell} ${styles.gridHeaderCellTime}`}>Hora</div>
@@ -270,22 +275,22 @@ export default function DashboardPage() {
                   <div key={plat.id} className={`${styles.gridHeaderCell} ${headerClass}`}>
                     {plat.id === 'facebook' && (
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                       </svg>
                     )}
                     {plat.id === 'instagram' && (
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
                       </svg>
                     )}
                     {plat.id === 'tiktok' && (
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.86-.74-3.94-1.74-.22-.22-.4-.45-.58-.7v5.13c.05 3.07-1.41 6.03-4.14 7.36-2.83 1.43-6.52 1.05-8.93-1.07-2.45-2.14-3.28-5.74-2.02-8.77C3.99 7.48 7.34 5.3 10.72 5.7c.2.02.4.06.6.1v4.09c-.89-.26-1.89-.2-2.7.25-.95.53-1.52 1.57-1.54 2.66-.02 1.55 1.25 2.91 2.8 2.91 1.49-.03 2.72-1.22 2.78-2.71.02-3.14.01-6.28.01-9.42-.01-.18-.09-.34-.15-.5z"/>
+                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.86-.74-3.94-1.74-.22-.22-.4-.45-.58-.7v5.13c.05 3.07-1.41 6.03-4.14 7.36-2.83 1.43-6.52 1.05-8.93-1.07-2.45-2.14-3.28-5.74-2.02-8.77C3.99 7.48 7.34 5.3 10.72 5.7c.2.02.4.06.6.1v4.09c-.89-.26-1.89-.2-2.7.25-.95.53-1.52 1.57-1.54 2.66-.02 1.55 1.25 2.91 2.8 2.91 1.49-.03 2.72-1.22 2.78-2.71.02-3.14.01-6.28.01-9.42-.01-.18-.09-.34-.15-.5z" />
                       </svg>
                     )}
                     {plat.id === 'x' && (
                       <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
                     )}
                     {plat.name}
@@ -299,12 +304,12 @@ export default function DashboardPage() {
               // Calculate if this hour row is active
               let isActive = false;
               let progressPercent = 0;
-              
+
               if (currentTime) {
                 const currentH = currentTime.getHours();
                 const currentM = currentTime.getMinutes();
                 const rowH = parseInt(hour.split(':')[0], 10);
-                
+
                 isActive = currentH === rowH;
                 progressPercent = (currentM / 60) * 100;
               }
@@ -322,7 +327,7 @@ export default function DashboardPage() {
                       </>
                     )}
                   </div>
-                  
+
                   {/* Platform columns cells for this hour */}
                   {PLATFORMS.map(plat => {
                     const cellItems = contentList.filter(item => {
@@ -332,15 +337,15 @@ export default function DashboardPage() {
                     });
 
                     return (
-                      <div 
-                        key={`${hour}-${plat.id}`} 
+                      <div
+                        key={`${hour}-${plat.id}`}
                         className={`${styles.gridCell} ${isActive ? styles.gridCellActive : ''}`}
                         onClick={() => role === 'editor' && handleOpenAddModal(hour, plat.id)}
                       >
                         {isActive && (
                           <div className={styles.indicatorLine} style={{ top: `${progressPercent}%` }} />
                         )}
-                        
+
                         {cellItems.map(cellItem => {
                           const startMin = parseInt(cellItem.time.split(':')[1], 10) || 0;
                           const topPercent = (startMin / 60) * 100;
@@ -349,49 +354,55 @@ export default function DashboardPage() {
 
                           return (
                             /* Publication Card */
-                            <div 
+                            <div
                               key={cellItem.id}
-                              className={`${styles.card} ${isShort ? styles.cardShort : ''} glass ${
-                                plat.id === 'facebook' ? styles.cardFb :
+                              className={`${styles.card} ${isShort ? styles.cardShort : ''} glass ${plat.id === 'facebook' ? styles.cardFb :
                                 plat.id === 'instagram' ? styles.cardIg :
-                                plat.id === 'tiktok' ? styles.cardTt : styles.cardX
-                              }`}
+                                  plat.id === 'tiktok' ? styles.cardTt : styles.cardX
+                                }`}
                               style={{
                                 top: `${topPercent}%`,
                                 height: `${heightPercent}%`,
                               }}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (role === 'editor') handleOpenEditModal(cellItem);
+                                if (role === 'editor') {
+                                  handleOpenEditModal(cellItem);
+                                } else {
+                                  setViewItem(cellItem);
+                                }
                               }}
                             >
                               <div className={styles.cardHeader}>
                                 <div className={styles.badgeGroup}>
-                                  <span className={`${styles.badge} ${
-                                    cellItem.type === 'post' ? styles.badgePost :
+                                  <span className={`${styles.badge} ${cellItem.type === 'post' ? styles.badgePost :
                                     cellItem.type === 'reel' ? styles.badgeReel : styles.badgeStory
-                                  }`}>
+                                    }`}>
                                     {cellItem.type}
                                   </span>
                                 </div>
-                                
-                                <span className={`${styles.statusBadge} ${
-                                  cellItem.status === 'published' ? styles.statusPublished :
+
+                                <span className={`${styles.statusBadge} ${cellItem.status === 'published' ? styles.statusPublished :
                                   cellItem.status === 'scheduled' ? styles.statusScheduled : styles.statusDraft
-                                }`}>
+                                  }`}>
                                   {cellItem.time} - {cellItem.status === 'published' ? 'Pub' :
-                                   cellItem.status === 'scheduled' ? 'Prog' : 'Borr'}
+                                    cellItem.status === 'scheduled' ? 'Prog' : 'Borr'}
                                 </span>
                               </div>
-                              
+
                               <p className={styles.cardBody} title={cellItem.description}>
+                                <br />
                                 {cellItem.description}
+                                {cellItem.url && (
+                                  <a href={cellItem.url} target="_blank" rel="noopener noreferrer" className={styles.cardUrlIcon} title={cellItem.url} onClick={(e) => e.stopPropagation()}>
+                                    <br />{cellItem.url}</a>
+                                )}
                               </p>
-                              
+
                               {/* Card Editor Actions */}
                               {role === 'editor' && (
                                 <div className={styles.cardFooter}>
-                                  <button 
+                                  <button
                                     className={`${styles.actionBtn} styles.actionBtnEdit`}
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -403,7 +414,7 @@ export default function DashboardPage() {
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                     </svg>
                                   </button>
-                                  <button 
+                                  <button
                                     className={`${styles.actionBtn} styles.actionBtnDelete`}
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -439,148 +450,204 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      
-        {/* Save / Edit Modal */}
-        {isModalOpen && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <div className={styles.modalHeader}>
-                <h2 className={styles.modalTitle}>
-                  {formId ? 'Editar Contenido' : 'Agregar a Parrilla'}
-                </h2>
-                <button 
-                  type="button" 
-                  className={styles.closeBtn}
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <form onSubmit={handleSaveItem}>
-                <div className={styles.modalBody}>
-                  
-                  <div className={styles.formGrid}>
-                    {/* Hour and Minute fields */}
-                    <div className={styles.field}>
-                      <label className={styles.fieldLabel}>Hora (Inicio)</label>
-                      <select 
-                        className={styles.modalInput}
-                        value={formHour}
-                        onChange={(e) => setFormHour(e.target.value)}
-                      >
-                        {HOURS.map(h => {
-                          const hr = h.split(':')[0];
-                          return <option key={hr} value={hr}>{hr}:xx</option>;
-                        })}
-                      </select>
-                    </div>
 
-                    <div className={styles.field}>
-                      <label className={styles.fieldLabel}>Minuto (Inicio)</label>
-                      <select 
-                        className={styles.modalInput}
-                        value={formMinute}
-                        onChange={(e) => setFormMinute(e.target.value)}
-                      >
-                        <option value="00">00</option>
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="45">45</option>
-                      </select>
-                    </div>
+      {/* Save / Edit Modal */}
+      {isModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>
+                {formId ? 'Contenido' : 'Agregar a Parrilla'}
+              </h2>
+              <button
+                type="button"
+                className={styles.closeBtn}
+                onClick={() => setIsModalOpen(false)}
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-                    {/* Duration field */}
-                    <div className={styles.field}>
-                      <label className={styles.fieldLabel}>Duración</label>
-                      <select 
-                        className={styles.modalInput}
-                        value={formDuration}
-                        onChange={(e) => setFormDuration(Number(e.target.value))}
-                      >
-                        <option value={15}>15 minutos</option>
-                        <option value={30}>30 minutos</option>
-                        <option value={45}>45 minutos</option>
-                        <option value={60}>60 minutos (1 hora)</option>
-                        <option value={120}>120 minutos (2 horas)</option>
-                      </select>
-                    </div>
-                    
-                    {/* Platform field */}
-                    <div className={styles.field}>
-                      <label className={styles.fieldLabel}>Red Social</label>
-                      <select 
-                        className={styles.modalInput}
-                        value={formPlatform}
-                        onChange={(e) => setFormPlatform(e.target.value as PlatformId)}
-                      >
-                        {PLATFORMS.map(p => (
-                          <option key={p.id} value={p.id}>{p.name}</option>
-                        ))}
-                      </select>
-                    </div>
+            <form onSubmit={handleSaveItem}>
+              <div className={styles.modalBody}>
 
-                    {/* Content Type field */}
-                    <div className={styles.field}>
-                      <label className={styles.fieldLabel}>Tipo de Contenido</label>
-                      <select 
-                        className={styles.modalInput}
-                        value={formType}
-                        onChange={(e) => setFormType(e.target.value as 'post' | 'reel' | 'story')}
-                      >
-                        <option value="post">Post / Texto</option>
-                        <option value="reel">Reel / Video Corto</option>
-                        <option value="story">Story</option>
-                      </select>
-                    </div>
-
-                    {/* Status field */}
-                    <div className={styles.field}>
-                      <label className={styles.fieldLabel}>Estado</label>
-                      <select 
-                        className={styles.modalInput}
-                        value={formStatus}
-                        onChange={(e) => setFormStatus(e.target.value as 'draft' | 'scheduled' | 'published')}
-                      >
-                        <option value="draft">Borrador</option>
-                        <option value="scheduled">Programado</option>
-                        <option value="published">Publicado</option>
-                      </select>
-                    </div>
-
-                    {/* Content Textarea */}
-                    <div className={`${styles.field} ${styles.fieldFull}`}>
-                      <label className={styles.fieldLabel}>Texto o Descripción del Proceso</label>
-                      <textarea 
-                        className={styles.modalTextarea}
-                        placeholder="Escribe aquí el copy de la publicación, hashtags o instrucciones técnicas del video..."
-                        value={formDescription}
-                        onChange={(e) => setFormDescription(e.target.value)}
-                      />
-                    </div>
+                <div className={styles.formGrid}>
+                  {/* Hour and Minute fields */}
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Hora (Inicio)</label>
+                    <select
+                      className={styles.modalInput}
+                      value={formHour}
+                      onChange={(e) => setFormHour(e.target.value)}
+                    >
+                      {HOURS.map(h => {
+                        const hr = h.split(':')[0];
+                        return <option key={hr} value={hr}>{hr}:xx</option>;
+                      })}
+                    </select>
                   </div>
 
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Minuto (Inicio)</label>
+                    <select
+                      className={styles.modalInput}
+                      value={formMinute}
+                      onChange={(e) => setFormMinute(e.target.value)}
+                    >
+                      <option value="00">00</option>
+                      <option value="15">15</option>
+                      <option value="30">30</option>
+                      <option value="45">45</option>
+                    </select>
+                  </div>
+
+                  {/* Duration field */}
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Duración</label>
+                    <select
+                      className={styles.modalInput}
+                      value={formDuration}
+                      onChange={(e) => setFormDuration(Number(e.target.value))}
+                    >
+                      <option value={15}>15 minutos</option>
+                      <option value={30}>30 minutos</option>
+                      <option value={45}>45 minutos</option>
+                      <option value={60}>60 minutos (1 hora)</option>
+                      <option value={120}>120 minutos (2 horas)</option>
+                    </select>
+                  </div>
+
+                  {/* Platform field */}
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Publicar en</label>
+                    <select
+                      className={styles.modalInput}
+                      value={formPlatform}
+                      onChange={(e) => setFormPlatform(e.target.value as PlatformId)}
+                    >
+                      {PLATFORMS.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Content Type field */}
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Tipo de Contenido</label>
+                    <select
+                      className={styles.modalInput}
+                      value={formType}
+                      onChange={(e) => setFormType(e.target.value as 'post' | 'reel' | 'story')}
+                    >
+                      <option value="post">Post / Texto</option>
+                      <option value="reel">Reel / Video Corto</option>
+                      <option value="story">Story</option>
+                    </select>
+                  </div>
+
+                  {/* Status field */}
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Estado</label>
+                    <select
+                      className={styles.modalInput}
+                      value={formStatus}
+                      onChange={(e) => setFormStatus(e.target.value as 'draft' | 'scheduled' | 'published')}
+                    >
+                      <option value="Publicado">Publicado</option>
+                      <option value="Programado">No Publicado</option>
+                      <option value="scheduled">Programado</option>
+                      <option value="published">Rechazado</option>
+                    </select>
+                  </div>
+
+                  {/* Content Textarea */}
+                  <div className={`${styles.field} ${styles.fieldFull}`}>
+                    <label className={styles.fieldLabel}>Copy del contenido</label>
+                    <textarea
+                      className={styles.modalTextarea}
+                      placeholder="Escribe aquí el copy de la publicación, hashtags o instrucciones técnicas..."
+                      value={formDescription}
+                      onChange={(e) => setFormDescription(e.target.value)}
+                    />
+                  </div>
+
+                  {/* URL Field */}
+                  <div className={`${styles.field} ${styles.fieldFull}`}>
+                    <label className={styles.fieldLabel}>Link de piezas</label>
+                    <input
+                      type="url"
+                      className={styles.modalInput}
+                      placeholder="https://..."
+                      value={formUrl}
+                      onChange={(e) => setFormUrl(e.target.value)}
+                    />
+                  </div>
                 </div>
 
-                <div className={styles.modalFooter}>
-                  <button 
-                    type="button" 
-                    className={styles.btnCancel}
-                    onClick={() => setIsModalOpen(false)}
-                  >
-                    Cancelar
-                  </button>
-                  <button type="submit" className={styles.btnSave}>
-                    Guardar Cambios
-                  </button>
-                </div>
-              </form>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <button
+                  type="button"
+                  className={styles.btnCancel}
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className={styles.btnSave}>
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+
+      {/* View Modal for Viewer Mode */}
+      {viewItem && (
+        <div className={styles.modalOverlay} onClick={() => setViewItem(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Detalles del Contenido</h2>
+              <button
+                type="button"
+                className={styles.closeBtn}
+                onClick={() => setViewItem(null)}
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p style={{ marginBottom: '0.5rem' }}><strong>Red Social:</strong> <span style={{ textTransform: 'capitalize' }}>{viewItem.platform}</span></p>
+              <p style={{ marginBottom: '0.5rem' }}><strong>Hora:</strong> {viewItem.time}</p>
+              <p style={{ marginBottom: '0.5rem' }}><strong>Tipo:</strong> <span style={{ textTransform: 'capitalize' }}>{viewItem.type}</span></p>
+              <p style={{ marginBottom: '0.5rem' }}><strong>Estado:</strong> <span style={{ textTransform: 'capitalize' }}>{viewItem.status}</span></p>
+              <p style={{ marginBottom: '0.5rem' }}><strong>Duración:</strong> {viewItem.duration} minutos</p>
+              {viewItem.url && (
+                <p style={{ marginBottom: '0.5rem' }}><strong>URL:</strong> <a href={viewItem.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>{viewItem.url}</a></p>
+              )}
+              <div style={{ marginTop: '1rem', whiteSpace: 'pre-wrap', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
+                <strong>Descripción:</strong><br /><br />
+                {viewItem.description}
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnCancel}
+                onClick={() => setViewItem(null)}
+              >
+                Cerrar
+              </button>
             </div>
           </div>
-        )}
-      
+        </div>
+      )}
 
     </div>
   );
