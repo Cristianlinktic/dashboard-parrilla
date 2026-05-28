@@ -24,7 +24,7 @@ export default function DashboardPage() {
   const [formMinute, setFormMinute] = useState('00');
   const [formDuration, setFormDuration] = useState<number>(60);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
-  const [formType, setFormType] = useState<'post' | 'reel' | 'story'>('post');
+  const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados'>('post');
   const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado'>('Programado');
   const [formDescription, setFormDescription] = useState('');
   const [formUrl, setFormUrl] = useState('');
@@ -546,7 +546,11 @@ export default function DashboardPage() {
                               <div className={styles.cardHeader}>
                                 <div className={styles.badgeGroup}>
                                   <span className={`${styles.badge} ${cellItem.type === 'post' ? styles.badgePost :
-                                    cellItem.type === 'reel' ? styles.badgeReel : styles.badgeStory
+                                    cellItem.type === 'reel' ? styles.badgeReel :
+                                      cellItem.type === 'Story' ? styles.badgeStory :
+                                        cellItem.type === 'Trino' ? styles.badgeTrino :
+                                          cellItem.type === 'Trino + imagen' ? styles.badgeTrinoImg :
+                                            styles.badgeQuoted
                                     }`}>
                                     {cellItem.type}
                                   </span>
@@ -713,11 +717,14 @@ export default function DashboardPage() {
                     <select
                       className={styles.modalInput}
                       value={formType}
-                      onChange={(e) => setFormType(e.target.value as 'post' | 'reel' | 'story')}
+                      onChange={(e) => setFormType(e.target.value as any)}
                     >
-                      <option value="post">Post / Texto</option>
-                      <option value="reel">Reel / Video Corto</option>
-                      <option value="story">Story</option>
+                      <option value="post">Post</option>
+                      <option value="reel">Reel</option>
+                      <option value="Story">Story</option>
+                      <option value="Trino">Trino</option>
+                      <option value="Trino + imagen">Trino + imagen</option>
+                      <option value="entrecomillados">entrecomillados</option>
                     </select>
                   </div>
 

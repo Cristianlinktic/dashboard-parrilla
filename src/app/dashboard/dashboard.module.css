@@ -465,6 +465,21 @@
   color: var(--type-story-text);
 }
 
+.badgeTrino {
+  background: var(--type-trino-bg);
+  color: var(--type-trino-text);
+}
+
+.badgeTrinoImg {
+  background: var(--type-trino-img-bg);
+  color: var(--type-trino-img-text);
+}
+
+.badgeQuoted {
+  background: var(--type-quoted-bg);
+  color: var(--type-quoted-text);
+}
+
 /* Status styles */
 .statusBadge {
   display: inline-flex;
