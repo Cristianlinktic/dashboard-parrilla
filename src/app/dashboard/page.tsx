@@ -245,17 +245,24 @@ export default function DashboardPage() {
     setIsSaving(true);
       try {
         // Fetch latest to avoid overwriting others
-        const { data } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
-        const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : contentList;
+        const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+        
+        if (fetchError) {
+          throw new Error('Error al conectar con la base de datos para eliminar. Reintente.');
+        }
+
+        const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
         
         const updatedList = latestContent.filter(item => item.id !== id);
         
         setContentList(updatedList);
         localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-        await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-      } catch (e) {
+        const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+        
+        if (saveError) throw saveError;
+      } catch (e: any) {
         console.error('Supabase delete upsert error:', e);
-        setErrorMsg('Error al eliminar en la nube.');
+        setErrorMsg(e.message || 'Error al eliminar en la nube.');
       } finally {
         setIsSaving(false);
       }
@@ -282,8 +289,13 @@ export default function DashboardPage() {
     setIsSaving(true);
     try {
       // Fetch latest to avoid overwriting others
-      const { data } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
-      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : contentList;
+      const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+      
+      if (fetchError) {
+        throw new Error('Error al conectar para añadir comentario. Reintente.');
+      }
+
+      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
 
       const updatedItem = {
         ...viewItem,
@@ -303,27 +315,28 @@ export default function DashboardPage() {
       setViewerCommentName('');
       setViewerCommentText('');
 
-      await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-    } catch (e) {
+      const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+      if (saveError) throw saveError;
+    } catch (e: any) {
       console.error('Error saving viewer comment:', e);
-      setErrorMsg('Error al guardar comentario en la nube.');
+      setErrorMsg(e.message || 'Error al guardar comentario en la nube.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleSaveItem = async (e: React.FormEvent) => {
+  const handleSaveItem = async (e: React.FormEvent, forceNew: boolean = false) => {
     e.preventDefault();
     if (!formDescription.trim()) {
       alert('Por favor, escribe el texto o descripción del contenido.');
       return;
     }
 
-    let updatedList: ContentItem[] = [];
+    const currentFormId = forceNew ? '' : formId;
     const timeStr = `${formHour}:${formMinute}`;
 
     const newItem: ContentItem = {
-      id: formId || Date.now().toString(),
+      id: currentFormId || Date.now().toString(),
       time: timeStr,
       platform: formPlatform,
       type: formType,
@@ -338,15 +351,21 @@ export default function DashboardPage() {
     setIsSaving(true);
     try {
       // Fetch latest to avoid overwriting others
-      const { data } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
-      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : contentList;
+      const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+      
+      // If there's an error fetching, we should probably stop to avoid saving a stale/empty list
+      if (fetchError) {
+        throw new Error('Error al obtener los datos más recientes. Intente de nuevo.');
+      }
+
+      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
 
       let updatedList: ContentItem[] = [];
 
-      if (formId) {
+      if (currentFormId) {
         // Editing existing
         updatedList = latestContent.map(item =>
-          item.id === formId ? newItem : item
+          item.id === currentFormId ? newItem : item
         );
       } else {
         // Adding new
@@ -356,14 +375,17 @@ export default function DashboardPage() {
       // Save updated list both locally and to Supabase
       setContentList(updatedList);
       localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-      await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-    } catch (e) {
-      console.error('Supabase upsert error:', e);
-      setErrorMsg('Error al guardar en la nube.');
+      const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+      
+      if (saveError) throw saveError;
+      
+      setIsModalOpen(false);
+    } catch (e: any) {
+      console.error('Supabase save error:', e);
+      setErrorMsg(e.message || 'Error al guardar en la nube.');
     } finally {
       setIsSaving(false);
     }
-    setIsModalOpen(false);
   };
 
   if (!isMounted) {
@@ -860,8 +882,7 @@ export default function DashboardPage() {
                     type="button"
                     className={styles.btnSaveNew}
                     onClick={(e) => {
-                      setFormId('');
-                      handleSaveItem(e);
+                      handleSaveItem(e, true);
                     }}
                     title="Crea una copia de este contenido en lugar de editar el original"
                   >
