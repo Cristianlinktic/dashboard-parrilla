@@ -556,6 +556,12 @@
   border-color: var(--status-por-crear-border);
 }
 
+.statusCne {
+  background: var(--status-cne-bg);
+  color: var(--status-cne-text);
+  border-color: var(--status-cne-border);
+}
+
 .cardBody {
   font-size: 13px;
   line-height: 1.5;

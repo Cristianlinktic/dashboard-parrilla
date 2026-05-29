@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const [formDuration, setFormDuration] = useState<number>(10);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
   const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados' | 'Espacio reservado'>('post');
-  const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido'>('Programado');
+  const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido' | 'Paso a CNE'>('Programado');
   const [formDescription, setFormDescription] = useState('');
   const [formUrl, setFormUrl] = useState('');
   const [formComments, setFormComments] = useState('');
@@ -603,7 +603,8 @@ export default function DashboardPage() {
                                   cellItem.status === 'Programado' ? styles.statusProgramado :
                                     cellItem.status === 'Rechazado' ? styles.statusRechazado :
                                       cellItem.status === 'Por crear contenido' ? styles.statusPorCrear :
-                                        styles.statusNoPublicado
+                                        cellItem.status === 'Paso a CNE' ? styles.statusCne :
+                                          styles.statusNoPublicado
                                   }`}>
                                   {cellItem.time} - {cellItem.status}
                                 </span>
@@ -791,6 +792,7 @@ export default function DashboardPage() {
                       <option value="Programado">Programado</option>
                       <option value="Rechazado">Rechazado</option>
                       <option value="Por crear contenido">Por crear contenido</option>
+                      <option value="Paso a CNE">Paso a CNE</option>
                     </select>
                   </div>
 

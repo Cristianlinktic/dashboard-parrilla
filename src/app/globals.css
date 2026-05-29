@@ -83,6 +83,10 @@
   --status-por-crear-text: #6d28d9;
   --status-por-crear-border: #ddd6fe;
 
+  --status-cne-bg: #eff6ff;
+  --status-cne-text: #1e40af;
+  --status-cne-border: #bfdbfe;
+
   /* Types Colors */
   --type-reel-bg: #22c55e;
   --type-reel-text: #ffffff;
@@ -154,6 +158,10 @@
   --status-por-crear-bg: rgba(109, 40, 217, 0.2);
   --status-por-crear-text: #a78bfa;
   --status-por-crear-border: #6d28d9;
+
+  --status-cne-bg: rgba(30, 64, 175, 0.2);
+  --status-cne-text: #93c5fd;
+  --status-cne-border: #1e40af;
 
   --type-reel-bg: rgba(34, 197, 94, 0.25);
   --type-reel-text: #4ade80;
