@@ -80,9 +80,18 @@ export default function DashboardPage() {
         if (error) throw error;
         
         if (data && data.length) {
-          // MIGRATION: Check if 'default' row still exists and contains an array
           const defaultRow = data.find(r => r.id === 'default');
-          if (defaultRow && Array.isArray(defaultRow.content)) {
+          const individualItems = data.filter(r => r.id !== 'default').map(r => r.content as ContentItem);
+
+          // If individual items exist AND a default row exists, we MUST clear/ignore the default row
+          // because it's likely a stale leftover from an old session.
+          if (defaultRow && individualItems.length > 0) {
+            console.log('Detected stale legacy row. Cleaning up...');
+            await supabase.from('dashboard_content').delete().eq('id', 'default');
+            setContentList(individualItems);
+            localStorage.setItem('dashboard_content_list', JSON.stringify(individualItems));
+          } else if (defaultRow && Array.isArray(defaultRow.content)) {
+            // MIGRATION: Only runs if no individual items exist yet
             console.log('Migrating legacy data to new multi-row structure...');
             const legacyItems = defaultRow.content as ContentItem[];
             for (const item of legacyItems) {
@@ -90,21 +99,20 @@ export default function DashboardPage() {
             }
             await supabase.from('dashboard_content').delete().eq('id', 'default');
             
-            // Re-fetch clean state
+            // Re-fetch to confirm
             const { data: migratedData } = await supabase.from('dashboard_content').select('*');
             const items = (migratedData || []).filter(r => r.id !== 'default').map(r => r.content as ContentItem);
             setContentList(items);
             localStorage.setItem('dashboard_content_list', JSON.stringify(items));
           } else {
-            const items = data.filter(r => r.id !== 'default').map(r => r.content as ContentItem);
-            setContentList(items);
-            localStorage.setItem('dashboard_content_list', JSON.stringify(items));
+            // Normal operation
+            setContentList(individualItems);
+            localStorage.setItem('dashboard_content_list', JSON.stringify(individualItems));
           }
         } else {
-          const saved = localStorage.getItem('dashboard_content_list');
-          if (saved) {
-            setContentList(JSON.parse(saved));
-          }
+          // Table completely empty
+          setContentList([]);
+          localStorage.removeItem('dashboard_content_list');
         }
       } catch (e) {
         console.error('Error in loadContent:', e);
@@ -286,6 +294,8 @@ export default function DashboardPage() {
       const { error } = await supabase.from('dashboard_content').delete().eq('id', itemToDelete);
       if (error) throw error;
       
+      console.log(`Item ${itemToDelete} deleted from DB.`);
+
       // Update local state and cache immediately
       setContentList(prev => {
         const updated = prev.filter(item => item.id !== itemToDelete);
@@ -295,6 +305,7 @@ export default function DashboardPage() {
       setItemToDelete(null);
     } catch (e: any) {
       console.error('Supabase delete error:', e);
+      alert('Error al eliminar en la nube: ' + (e.message || 'Error desconocido'));
       setErrorMsg(e.message || 'Error al eliminar en la nube.');
     } finally {
       setIsSaving(false);
