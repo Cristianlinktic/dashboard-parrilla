@@ -200,6 +200,7 @@ export default function DashboardPage() {
     };
 
     const onMouseUp = async () => {
+      const currentDraggingId = draggingId;
       setDraggingId(null);
       // Persistir el cambio final
       const currentListValue = JSON.parse(localStorage.getItem('dashboard_content_list') || '[]');
@@ -209,7 +210,10 @@ export default function DashboardPage() {
       // Since it's in the dependency array, it should be fine.
       localStorage.setItem('dashboard_content_list', JSON.stringify(contentList));
       try {
-        await supabase.from('dashboard_content').upsert({ id: 'default', content: contentList });
+        const draggedItem = contentList.find(item => item.id === currentDraggingId);
+        if (draggedItem) {
+          await supabase.from('dashboard_content').upsert({ id: draggedItem.id, content: draggedItem });
+        }
       } catch (e) {
         console.error('Error auto-saving after drag:', e);
       }
@@ -291,8 +295,12 @@ export default function DashboardPage() {
     setIsModalOpen(false); // Close modal if open
     
     try {
-      const { error } = await supabase.from('dashboard_content').delete().eq('id', itemToDelete);
+      const { error, count } = await supabase.from('dashboard_content').delete({ count: 'exact' }).eq('id', itemToDelete);
       if (error) throw error;
+      
+      if (count === 0) {
+        throw new Error("No se pudo eliminar en la base de datos. Por favor, asegúrate de habilitar la política RLS de DELETE en Supabase.");
+      }
       
       console.log(`Item ${itemToDelete} deleted from DB.`);
 
@@ -365,6 +373,8 @@ export default function DashboardPage() {
     const currentFormId = forceNew ? '' : formId;
     const timeStr = `${formHour}:${formMinute}`;
 
+    const existingItem = contentList.find(i => i.id === currentFormId);
+
     const newItem: ContentItem = {
       id: currentFormId || Date.now().toString(),
       time: timeStr,
@@ -375,7 +385,8 @@ export default function DashboardPage() {
       duration: Number(formDuration),
       url: formUrl,
       comments: formComments,
-      kpi: formKpi
+      kpi: formKpi,
+      viewerComments: existingItem ? existingItem.viewerComments : []
     };
 
     setIsSaving(true);

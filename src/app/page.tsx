@@ -32,16 +32,22 @@ export default function LoginPage() {
 
     // Simulate network delay for premium feel
     setTimeout(() => {
-      const editorPass = process.env.NEXT_PUBLIC_EDITOR_PASS;
-      const viewerPass = process.env.NEXT_PUBLIC_VIEWER_PASS;
+      const rawEditorPass = process.env.NEXT_PUBLIC_EDITOR_PASS || '';
+      const rawViewerPass = process.env.NEXT_PUBLIC_VIEWER_PASS || '';
+      
+      const cleanPass = (p: string) => p.replace(/^"|"$/g, '').trim();
+      
+      const editorPass = cleanPass(rawEditorPass);
+      const viewerPass = cleanPass(rawViewerPass);
+      const inputPass = cleanPass(password);
 
-      if (password === editorPass) {
+      if (inputPass === editorPass) {
         localStorage.setItem(
           'dashboard_session',
           JSON.stringify({ role: 'editor', timestamp: Date.now() })
         );
         router.push('/dashboard');
-      } else if (password === viewerPass) {
+      } else if (inputPass === viewerPass) {
         localStorage.setItem(
           'dashboard_session',
           JSON.stringify({ role: 'viewer', timestamp: Date.now() })
