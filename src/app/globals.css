@@ -59,8 +59,8 @@
   --color-tt: #0f172a;
   --color-tt-glow: rgba(15, 23, 42, 0.06);
 
-  --color-x: #0f172a;
-  --color-x-glow: rgba(15, 23, 42, 0.06);
+  --color-x: #7c3aed;
+  --color-x-glow: rgba(124, 58, 237, 0.08);
 
   /* Status Colors (aligned to Flag Colors where applicable) */
   --status-publicado-bg: #dcfce7;
@@ -133,7 +133,7 @@
   --border-banner-viewer: #3b82f6;
 
   --color-tt: #f8fafc;
-  --color-x: #f8fafc;
+  --color-x: #a78bfa;
 
   --status-publicado-bg: rgba(21, 128, 61, 0.2);
   --status-publicado-text: #4ade80;

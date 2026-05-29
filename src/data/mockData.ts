@@ -29,7 +29,7 @@ export const PLATFORMS = [
   { id: 'facebook', name: 'Facebook', color: '#1877F2', icon: 'FB' },
   { id: 'instagram', name: 'Instagram', color: '#E4405F', icon: 'IG' },
   { id: 'tiktok', name: 'TikTok', color: '#000000', icon: 'TT' },
-  { id: 'x', name: 'X (Twitter)', color: '#000000', icon: 'X' }
+  { id: 'x', name: 'X (Twitter)', color: '#7c3aed', icon: 'X' }
 ] as const;
 
 export type PlatformId = typeof PLATFORMS[number]['id'];
