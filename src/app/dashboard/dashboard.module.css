@@ -843,6 +843,30 @@
   transform: translateY(-1px);
 }
 
+.modalDeleteBtn {
+  background: #fff;
+  border: 1px solid var(--col-red);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--col-red);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.modalDeleteBtn:hover {
+  background: var(--col-red-light);
+  transform: scale(1.05);
+}
+
+.modalSmall {
+  max-width: 400px;
+}
+
 .btnSave:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(29, 78, 216, 0.25);

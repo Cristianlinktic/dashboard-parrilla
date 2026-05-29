@@ -41,6 +41,9 @@ export default function DashboardPage() {
   // Viewer comment states
   const [viewerCommentName, setViewerCommentName] = useState('');
   const [viewerCommentText, setViewerCommentText] = useState('');
+  
+  // Delete confirmation state
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -239,33 +242,36 @@ export default function DashboardPage() {
     setHasMoved(false);
   };
 
-  const handleDeleteItem = async (id: string) => {
-    if (role !== 'editor') return;
-    if (!confirm('¿Estás seguro de que deseas eliminar esta publicación de la parrilla?')) return;
+  const handleDeleteItem = async () => {
+    if (role !== 'editor' || !itemToDelete) return;
+    
     setIsSaving(true);
-      try {
-        // Fetch latest to avoid overwriting others
-        const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
-        
-        if (fetchError) {
-          throw new Error('Error al conectar con la base de datos para eliminar. Reintente.');
-        }
-
-        const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
-        
-        const updatedList = latestContent.filter(item => item.id !== id);
-        
-        setContentList(updatedList);
-        localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-        const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-        
-        if (saveError) throw saveError;
-      } catch (e: any) {
-        console.error('Supabase delete upsert error:', e);
-        setErrorMsg(e.message || 'Error al eliminar en la nube.');
-      } finally {
-        setIsSaving(false);
+    setIsModalOpen(false); // Close modal if open
+    
+    try {
+      // Fetch latest to avoid overwriting others
+      const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+      
+      if (fetchError) {
+        throw new Error('Error al conectar con la base de datos para eliminar. Reintente.');
       }
+
+      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
+      
+      const updatedList = latestContent.filter(item => item.id !== itemToDelete);
+      
+      setContentList(updatedList);
+      localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
+      const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
+      
+      if (saveError) throw saveError;
+      setItemToDelete(null);
+    } catch (e: any) {
+      console.error('Supabase delete upsert error:', e);
+      setErrorMsg(e.message || 'Error al eliminar en la nube.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddViewerComment = async (e: React.FormEvent) => {
@@ -660,7 +666,7 @@ export default function DashboardPage() {
                                     className={`${styles.actionBtn} styles.actionBtnDelete`}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      handleDeleteItem(cellItem.id);
+                                      setItemToDelete(cellItem.id);
                                     }}
                                     title="Eliminar publicación"
                                   >
@@ -892,6 +898,18 @@ export default function DashboardPage() {
                 <button type="submit" className={styles.btnSave}>
                   {formId ? 'Guardar Cambios' : 'Guardar en Parrilla'}
                 </button>
+                {formId && (
+                  <button
+                    type="button"
+                    className={styles.modalDeleteBtn}
+                    onClick={() => setItemToDelete(formId)}
+                    title="Eliminar esta publicación"
+                  >
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </form>
           </div>
@@ -1018,6 +1036,40 @@ export default function DashboardPage() {
                 onClick={() => setViewItem(null)}
               >
                 Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {itemToDelete && (
+        <div className={styles.modalOverlay} style={{ zIndex: 1000 }}>
+          <div className={`${styles.modal} ${styles.modalSmall}`}>
+            <div className={styles.modalHeader} style={{ background: 'var(--col-red-light)', borderBottomColor: 'var(--col-red)' }}>
+              <h2 className={styles.modalTitle} style={{ color: 'var(--col-red)' }}>Confirmar eliminación</h2>
+            </div>
+            <div className={styles.modalBody}>
+              <p style={{ fontSize: '16px', textAlign: 'center', margin: '20px 0', lineHeight: '1.6' }}>
+                ¿Estás seguro de que deseas eliminar esta publicación? <br />
+                <strong>Esta acción no se puede deshacer y afectará a todos los usuarios.</strong>
+              </p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.btnCancel}
+                onClick={() => setItemToDelete(null)}
+              >
+                No, cancelar
+              </button>
+              <button
+                type="button"
+                className={styles.btnSave}
+                style={{ background: 'var(--col-red)', boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)' }}
+                onClick={handleDeleteItem}
+              >
+                Sí, eliminar definitivamente
               </button>
             </div>
           </div>
