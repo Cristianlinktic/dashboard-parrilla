@@ -132,17 +132,28 @@ export default function DashboardPage() {
             if (!newItem) return;
             setContentList(prev => {
               const idx = prev.findIndex(i => i.id === newItem.id);
+              let updated;
               if (idx > -1) {
-                const updated = [...prev];
+                updated = [...prev];
                 updated[idx] = newItem;
-                return updated;
+              } else {
+                updated = [...prev, newItem];
               }
-              return [...prev, newItem];
+              localStorage.setItem('dashboard_content_list', JSON.stringify(updated));
+              return updated;
             });
           } else if (payload.eventType === 'DELETE') {
             const deletedId = (payload.old as any).id;
-            if (deletedId === 'default') return;
-            setContentList(prev => prev.filter(item => item.id !== deletedId));
+            if (deletedId === 'default') {
+              // Someone might still be writing to default, let's trigger a re-fetch
+              loadContent();
+              return;
+            }
+            setContentList(prev => {
+              const updated = prev.filter(item => item.id !== deletedId);
+              localStorage.setItem('dashboard_content_list', JSON.stringify(updated));
+              return updated;
+            });
           }
         }
       )
@@ -275,8 +286,12 @@ export default function DashboardPage() {
       const { error } = await supabase.from('dashboard_content').delete().eq('id', itemToDelete);
       if (error) throw error;
       
-      // Local state will be updated by Realtime, but for better UX:
-      setContentList(prev => prev.filter(item => item.id !== itemToDelete));
+      // Update local state and cache immediately
+      setContentList(prev => {
+        const updated = prev.filter(item => item.id !== itemToDelete);
+        localStorage.setItem('dashboard_content_list', JSON.stringify(updated));
+        return updated;
+      });
       setItemToDelete(null);
     } catch (e: any) {
       console.error('Supabase delete error:', e);
@@ -357,15 +372,18 @@ export default function DashboardPage() {
       const { error } = await supabase.from('dashboard_content').upsert({ id: newItem.id, content: newItem });
       if (error) throw error;
       
-      // Local state will be updated by Realtime, but for better immediate UX:
+      // Update local state and cache
       setContentList(prev => {
         const index = prev.findIndex(item => item.id === newItem.id);
+        let updated;
         if (index > -1) {
-          const updated = [...prev];
+          updated = [...prev];
           updated[index] = newItem;
-          return updated;
+        } else {
+          updated = [...prev, newItem];
         }
-        return [...prev, newItem];
+        localStorage.setItem('dashboard_content_list', JSON.stringify(updated));
+        return updated;
       });
 
       setIsModalOpen(false);
