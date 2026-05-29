@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const [formDuration, setFormDuration] = useState<number>(10);
   const [formPlatform, setFormPlatform] = useState<PlatformId>('facebook');
   const [formType, setFormType] = useState<'post' | 'reel' | 'Story' | 'Trino' | 'Trino + imagen' | 'entrecomillados' | 'Espacio reservado'>('post');
-  const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido' | 'Paso a CNE'>('Programado');
+  const [formStatus, setFormStatus] = useState<'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido' | 'Paso a CNE' | 'Publicado - Eliminado'>('Programado');
   const [formDescription, setFormDescription] = useState('');
   const [formUrl, setFormUrl] = useState('');
   const [formComments, setFormComments] = useState('');
@@ -655,7 +655,8 @@ export default function DashboardPage() {
                                     cellItem.status === 'Rechazado' ? styles.statusRechazado :
                                       cellItem.status === 'Por crear contenido' ? styles.statusPorCrear :
                                         cellItem.status === 'Paso a CNE' ? styles.statusCne :
-                                          styles.statusNoPublicado
+                                          cellItem.status === 'Publicado - Eliminado' ? styles.statusPublicadoEliminado :
+                                            styles.statusNoPublicado
                                   }`}>
                                   {cellItem.time} - {cellItem.status}
                                 </span>
@@ -836,7 +837,7 @@ export default function DashboardPage() {
                     <select
                       className={styles.modalInput}
                       value={formStatus}
-                      onChange={(e) => setFormStatus(e.target.value as 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido')}
+                      onChange={(e) => setFormStatus(e.target.value as 'Publicado' | 'No Publicado' | 'Programado' | 'Rechazado' | 'Por crear contenido' | 'Paso a CNE' | 'Publicado - Eliminado')}
                     >
                       <option value="Publicado">Publicado</option>
                       <option value="No Publicado">No Publicado</option>
@@ -844,6 +845,7 @@ export default function DashboardPage() {
                       <option value="Rechazado">Rechazado</option>
                       <option value="Por crear contenido">Por crear contenido</option>
                       <option value="Paso a CNE">Paso a CNE</option>
+                      <option value="Publicado - Eliminado">Publicado - Eliminado</option>
                     </select>
                   </div>
 

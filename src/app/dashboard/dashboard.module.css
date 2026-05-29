@@ -562,6 +562,12 @@
   border-color: var(--status-cne-border);
 }
 
+.statusPublicadoEliminado {
+  background: var(--status-publicado-eliminado-bg);
+  color: var(--status-publicado-eliminado-text);
+  border-color: var(--status-publicado-eliminado-border);
+}
+
 .cardBody {
   font-size: 13px;
   line-height: 1.5;

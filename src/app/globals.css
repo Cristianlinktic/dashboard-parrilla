@@ -87,6 +87,10 @@
   --status-cne-text: #1e40af;
   --status-cne-border: #bfdbfe;
 
+  --status-publicado-eliminado-bg: #fee2e2;
+  --status-publicado-eliminado-text: #991b1b;
+  --status-publicado-eliminado-border: #fecaca;
+
   /* Types Colors */
   --type-reel-bg: #22c55e;
   --type-reel-text: #ffffff;
@@ -162,6 +166,10 @@
   --status-cne-bg: rgba(30, 64, 175, 0.2);
   --status-cne-text: #93c5fd;
   --status-cne-border: #1e40af;
+
+  --status-publicado-eliminado-bg: rgba(153, 27, 27, 0.2);
+  --status-publicado-eliminado-text: #fecaca;
+  --status-publicado-eliminado-border: #991b1b;
 
   --type-reel-bg: rgba(34, 197, 94, 0.25);
   --type-reel-text: #4ade80;
