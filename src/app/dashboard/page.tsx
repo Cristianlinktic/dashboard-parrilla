@@ -76,35 +76,46 @@ export default function DashboardPage() {
 
     const loadContent = async () => {
       try {
-        const { data, error } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+        const { data, error } = await supabase.from('dashboard_content').select('*');
         if (error) throw error;
+        
         if (data && data.length) {
-          const remoteContent = data[0].content as ContentItem[];
-          setContentList(remoteContent);
-          localStorage.setItem('dashboard_content_list', JSON.stringify(remoteContent));
+          // MIGRATION: Check if 'default' row still exists and contains an array
+          const defaultRow = data.find(r => r.id === 'default');
+          if (defaultRow && Array.isArray(defaultRow.content)) {
+            console.log('Migrating legacy data to new multi-row structure...');
+            const legacyItems = defaultRow.content as ContentItem[];
+            for (const item of legacyItems) {
+              await supabase.from('dashboard_content').upsert({ id: item.id, content: item });
+            }
+            await supabase.from('dashboard_content').delete().eq('id', 'default');
+            
+            // Re-fetch clean state
+            const { data: migratedData } = await supabase.from('dashboard_content').select('*');
+            const items = (migratedData || []).filter(r => r.id !== 'default').map(r => r.content as ContentItem);
+            setContentList(items);
+            localStorage.setItem('dashboard_content_list', JSON.stringify(items));
+          } else {
+            const items = data.filter(r => r.id !== 'default').map(r => r.content as ContentItem);
+            setContentList(items);
+            localStorage.setItem('dashboard_content_list', JSON.stringify(items));
+          }
         } else {
           const saved = localStorage.getItem('dashboard_content_list');
           if (saved) {
             setContentList(JSON.parse(saved));
-          } else {
-            setContentList([]);
-            localStorage.setItem('dashboard_content_list', JSON.stringify([]));
           }
         }
       } catch (e) {
+        console.error('Error in loadContent:', e);
         const saved = localStorage.getItem('dashboard_content_list');
-        if (saved) {
-          setContentList(JSON.parse(saved));
-        } else {
-          setContentList([]);
-          localStorage.setItem('dashboard_content_list', JSON.stringify([]));
-        }
+        if (saved) setContentList(JSON.parse(saved));
       }
     };
 
     loadContent();
 
-    // Setup Realtime subscription
+    // Setup Realtime subscription - Listen to ALL changes
     const channel = supabase
       .channel('schema-db-changes')
       .on(
@@ -112,14 +123,26 @@ export default function DashboardPage() {
         {
           event: '*',
           schema: 'public',
-          table: 'dashboard_content',
-          filter: 'id=eq.default'
+          table: 'dashboard_content'
         },
         (payload) => {
-          if (payload.new && (payload.new as any).content) {
-            const newContent = (payload.new as any).content as ContentItem[];
-            setContentList(newContent);
-            localStorage.setItem('dashboard_content_list', JSON.stringify(newContent));
+          console.log('Change received:', payload);
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const newItem = (payload.new as any).content as ContentItem;
+            if (!newItem) return;
+            setContentList(prev => {
+              const idx = prev.findIndex(i => i.id === newItem.id);
+              if (idx > -1) {
+                const updated = [...prev];
+                updated[idx] = newItem;
+                return updated;
+              }
+              return [...prev, newItem];
+            });
+          } else if (payload.eventType === 'DELETE') {
+            const deletedId = (payload.old as any).id;
+            if (deletedId === 'default') return;
+            setContentList(prev => prev.filter(item => item.id !== deletedId));
           }
         }
       )
@@ -249,25 +272,14 @@ export default function DashboardPage() {
     setIsModalOpen(false); // Close modal if open
     
     try {
-      // Fetch latest to avoid overwriting others
-      const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+      const { error } = await supabase.from('dashboard_content').delete().eq('id', itemToDelete);
+      if (error) throw error;
       
-      if (fetchError) {
-        throw new Error('Error al conectar con la base de datos para eliminar. Reintente.');
-      }
-
-      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
-      
-      const updatedList = latestContent.filter(item => item.id !== itemToDelete);
-      
-      setContentList(updatedList);
-      localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-      const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-      
-      if (saveError) throw saveError;
+      // Local state will be updated by Realtime, but for better UX:
+      setContentList(prev => prev.filter(item => item.id !== itemToDelete));
       setItemToDelete(null);
     } catch (e: any) {
-      console.error('Supabase delete upsert error:', e);
+      console.error('Supabase delete error:', e);
       setErrorMsg(e.message || 'Error al eliminar en la nube.');
     } finally {
       setIsSaving(false);
@@ -294,38 +306,24 @@ export default function DashboardPage() {
 
     setIsSaving(true);
     try {
-      // Fetch latest to avoid overwriting others
-      const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
-      
-      if (fetchError) {
-        throw new Error('Error al conectar para añadir comentario. Reintente.');
-      }
-
-      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
-
       const updatedItem = {
         ...viewItem,
         viewerComments: [...(viewItem.viewerComments || []), newComment]
       };
 
-      const updatedList = latestContent.map(item =>
-        item.id === viewItem.id ? updatedItem : item
-      );
+      const { error } = await supabase.from('dashboard_content').upsert({ id: viewItem.id, content: updatedItem });
+      if (error) throw error;
 
-      // Save
-      setContentList(updatedList);
+      // Update local UI
       setViewItem(updatedItem);
-      localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
+      setContentList(prev => prev.map(item => item.id === viewItem.id ? updatedItem : item));
 
       // Clear form
       setViewerCommentName('');
       setViewerCommentText('');
-
-      const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-      if (saveError) throw saveError;
     } catch (e: any) {
       console.error('Error saving viewer comment:', e);
-      setErrorMsg(e.message || 'Error al guardar comentario en la nube.');
+      setErrorMsg(e.message || 'Error al guardar comentario.');
     } finally {
       setIsSaving(false);
     }
@@ -356,35 +354,20 @@ export default function DashboardPage() {
 
     setIsSaving(true);
     try {
-      // Fetch latest to avoid overwriting others
-      const { data, error: fetchError } = await supabase.from('dashboard_content').select('content').eq('id', 'default');
+      const { error } = await supabase.from('dashboard_content').upsert({ id: newItem.id, content: newItem });
+      if (error) throw error;
       
-      // If there's an error fetching, we should probably stop to avoid saving a stale/empty list
-      if (fetchError) {
-        throw new Error('Error al obtener los datos más recientes. Intente de nuevo.');
-      }
+      // Local state will be updated by Realtime, but for better immediate UX:
+      setContentList(prev => {
+        const index = prev.findIndex(item => item.id === newItem.id);
+        if (index > -1) {
+          const updated = [...prev];
+          updated[index] = newItem;
+          return updated;
+        }
+        return [...prev, newItem];
+      });
 
-      const latestContent = (data && data.length) ? (data[0].content as ContentItem[]) : [];
-
-      let updatedList: ContentItem[] = [];
-
-      if (currentFormId) {
-        // Editing existing
-        updatedList = latestContent.map(item =>
-          item.id === currentFormId ? newItem : item
-        );
-      } else {
-        // Adding new
-        updatedList = [...latestContent, newItem];
-      }
-
-      // Save updated list both locally and to Supabase
-      setContentList(updatedList);
-      localStorage.setItem('dashboard_content_list', JSON.stringify(updatedList));
-      const { error: saveError } = await supabase.from('dashboard_content').upsert({ id: 'default', content: updatedList });
-      
-      if (saveError) throw saveError;
-      
       setIsModalOpen(false);
     } catch (e: any) {
       console.error('Supabase save error:', e);
